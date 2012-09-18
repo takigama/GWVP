@@ -51,6 +51,8 @@ function gwvpmini_RepoMainPage()
 
 function gwvpmini_RepoMainPageBody()
 {
+	global $BASE_URL;
+	
 	gwvpmini_GitCreateRepoForm();
 	if(gwvpmini_isLoggedIn()) {
 		$repos = gwvpmini_GetOwnedRepos($_SESSION["username"]);
@@ -62,7 +64,7 @@ function gwvpmini_RepoMainPageBody()
 			foreach($repos as $repo) {
 				$name = $repo["name"];
 				$desc = $repo["desc"];
-				echo "<tr><td>$name</td><td>$desc</td>";
+				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
 				$repo_base = gwvpmini_getConfigVal("repodir");
 				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2>&1";
@@ -90,6 +92,9 @@ function gwvpmini_GitLogProvider()
 	*
 	* Or... should we instead just list every repo?
 	*/
+	
+	global $BASE_URL;
+	
 	echo "<h2>Repo Activity</h2>";
 	if(gwvpmini_isLoggedIn()) {
 		$repos = gwvpmini_GetOwnedRepos($_SESSION["username"]);
@@ -101,7 +106,7 @@ function gwvpmini_GitLogProvider()
 			foreach($repos as $repo) {
 				$name = $repo["name"];
 				$desc = $repo["desc"];
-				echo "<tr><td>$name</td><td>$desc</td>";
+				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
 				$repo_base = gwvpmini_getConfigVal("repodir");
 				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2>&1";

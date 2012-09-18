@@ -164,7 +164,7 @@ function gwvpmini_RepoCreate()
 			gwvpmini_SendMessage("error", "Repo ".$_REQUEST["reponame"]." already exists");
 			header("Location: $BASE_URL/repos");
 		} else {
-			gwvpmini_createGitRepo($_REQUEST["reponame"], $_SESSION["id"], $_REQUEST["repodesc"]);
+			gwvpmini_createGitRepo($_REQUEST["reponame"], $_SESSION["id"], $_REQUEST["repodesc"], $_REQUEST["perms"]);
 			gwvpmini_SendMessage("info", "Repo ".$_REQUEST["reponame"]." has been created");
 			header("Location: $BASE_URL/repos");
 		}

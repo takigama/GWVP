@@ -90,6 +90,11 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	
 	
 	echo "<table width=\"100%\">";
+	
+	echo "<tr width=\"100%\" bgcolor=\"#ddddff\"><td colspan=\"2\" align=\"right\">";
+	gwvpmini_SearchBuilder();
+	echo "</td></tr>";
+	
 
 	if(isset($_SESSION["message"])) {
 		echo "<tr width=\"100%\"><td colspan=\"2\">";

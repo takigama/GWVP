@@ -97,6 +97,13 @@ function gwvpmini_isLoggedIn()
 function gwvpmini_AskForBasicAuth()
 {
 	error_log("SEND BASIC AUTH");
+	header_remove("Pragma");
+	header_remove("Cache-Control");
+	header_remove("Set-Cookie");
+	header_remove("Expires");
+	header_remove("X-Powered-By");
+	header_remove("Vary");
+	
 	header('HTTP/1.1 401 Unauthorized');
 	header('WWW-Authenticate: Basic realm="GITRepo"');
 }

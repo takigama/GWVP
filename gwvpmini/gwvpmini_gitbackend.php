@@ -94,7 +94,7 @@ function gwvpmini_gitBackendInterface()
 	
 	$perms = 5;
 	
-	$write = true;
+	//$write = true;
 	
 	// if its a write, we push for authentication
 	if($write) {

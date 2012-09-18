@@ -86,6 +86,30 @@ function gwvpmini_ConnectDB()
 	return $DB_CONNECTION;
 }
 
+function gwvpmini_AddUser($username, $password, $fullname, $email, $desc, $level, $status)
+{
+	
+	
+	
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "insert into 'users' values ( null, '$fullname', '".sha1($password)."', '$username', '$email', '$desc', '$level', '$status')";
+	
+	$res = $conn->query($sql);
+	if(!$res) return -1;
+	
+	$sql = "select user_id from users where user_username='$username'";
+	$res = $conn->query($sql);
+	if(!$res) return -1;
+	
+	$retval = -1;
+	foreach($res as $row) {
+		$retval = $row[0];
+	}
+	
+	return $retval;
+}
+
 
 function gwvpmini_dbCreateSQLiteStructure($dbloc)
 {
@@ -98,7 +122,8 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	"user_email" TEXT,
 	"user_desc" TEXT,
 	"user_level" TEXT,
-	"user_status" TEXT
+	"user_status" TEXT,
+	UNIQUE(user_username)
 	)';
 
 	$initialuser_admin = '
@@ -114,7 +139,9 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	"repos_id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"repos_name" TEXT,
 	"repos_description" TEXT,
-	"repos_owner" INTEGER
+	"repos_owner" INTEGER,
+	"repos_readperms" TEXT,
+	UNIQUE(repos_name)
 	)';
 
 	// this looks like null, <repoid>, <read|visible|write>, user:<uid>|group:<gid>|authed|anon
@@ -234,13 +261,13 @@ function gwvpmini_setConfigVal($confname, $confval)
 	return $conn->query($sql);
 }
 
-function gwvpmini_AddRepo($name, $desc, $ownerid)
+function gwvpmini_AddRepo($name, $desc, $ownerid, $perms = "perms-public")
 {
 	
 	error_log("addrepo in db for $name, $desc, $ownerid");
 	$conn = gwvpmini_ConnectDB();
 	
-	$sql = "insert into repos values (null, '$name', '$desc', '$ownerid')";
+	$sql = "insert into repos values (null, '$name', '$desc', '$ownerid', '$perms')";
 	
 	$conn->query($sql);
 }
@@ -310,7 +337,7 @@ function gwvpmini_userLevel($id)
 	return $lev;
 }
 
-function gwvpmini_GetUsers()
+function gwvpmini_GetUsers($startat = 0, $num = 10)
 {
 	$conn = gwvpmini_ConnectDB();
 	
@@ -327,7 +354,7 @@ function gwvpmini_GetUsers()
 
 	 */
 	
-	$sql = "select * from users";
+	$sql = "select * from users where user_id>'$startat' order by user_id asc limit $num";
 	
 	$res = $conn->query($sql);
 	
@@ -342,6 +369,70 @@ function gwvpmini_GetUsers()
 		$retval[$id]["status"] = $row["user_status"];
 	}
 	
+	return $retval;
+}
+
+function gwvpmini_GetRepos($startat=0, $num=200)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	/*
+	 * 	CREATE TABLE "repos" (
+	"repos_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"repos_name" TEXT,
+	"repos_description" TEXT,
+	"repos_owner" INTEGER
+	)';
+	
+	 		*/
+	
+	$sql = "select * from repos where repos_id > '$startat' order by repos_id asc limit $num";
+	
+	$res = $conn->query($sql);
+	
+	$retval = false;
+	foreach($res as $row) {
+		$id = $row["repos_id"];
+		$retval[$id]["name"] = $row["repos_name"];
+		$retval[$id]["desc"] = $row["repos_description"];
+		$retval[$id]["owner"] = $row["repos_owner"];
+	}
+	
+	return $retval;
+	
+	
+}
+
+function gwvpmini_GetNRepos()
+{
+	$conn = gwvpmini_ConnectDB();
+
+	$sql = "select count(*) from repos";
+	
+	$res = $conn->query($sql);
+	
+	$retval = -1;
+	foreach($res as $row) {
+		$retval = $row[0];
+	}
+	
+	return $retval;
+}
+
+
+function gwvpmini_GetNUsers()
+{
+	$conn = gwvpmini_ConnectDB();
+
+	$sql = "select count(*) from users";
+
+	$res = $conn->query($sql);
+
+	$retval = -1;
+	foreach($res as $row) {
+		$retval = $row[0];
+	}
+
 	return $retval;
 }
 

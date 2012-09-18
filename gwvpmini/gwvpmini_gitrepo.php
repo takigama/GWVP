@@ -124,6 +124,13 @@ function gwvpmini_GitCreateRepoForm()
 	echo "<tr><th colspan=\"2\">Create Repo</th></tr>";
 	echo "<tr><th>Repo Name</th><td><input type=\"text\" name=\"reponame\"></td></tr>";
 	echo "<tr><th>Repo Description</th><td><input type=\"text\" name=\"repodesc\"></td></tr>";
+	echo "<tr><th>Read Permissions</th><td>";
+	echo "<select name=\"perms\">";
+	echo "<option value=\"perms-public\">Anyone Can Read</option>";
+	echo "<option value=\"perms-registered\">Must be Registered To Read</option>";
+	echo "<option value=\"perms-onlywrite\">Only Writers can Read</option>";
+	echo "</select>";
+	echo "</td></tr>";
 	echo "<tr><td colspan=\"2\"><input type=\"submit\" name=\"Create\" value=\"Create\"></td></tr>";
 	echo "</table>";
 	echo "</form>";
@@ -134,7 +141,24 @@ function gwvpmini_RepoCreate()
 	
 	global $BASE_URL;
 	
-	if(gwvpmini_isLoggedIn()) {
+	// TODO: check the stuff out
+	// first reponame
+	$inputcheck = true;
+
+	// remove a .git at the end if it was input
+	$_REQUEST["reponame"] = preg_replace("/\.git$/", "", $_REQUEST["reponame"]);
+	
+	// check for valid chars
+	$replcheck = preg_replace("/[a-zA-Z0-9_\-\.]/", "", $_REQUEST["reponame"]);
+	if(strlen($replcheck)>0) {
+		$inputcheck = false;
+		$inputcheckerror = "Repo name contains invalid characters, repos can only contain a-z, A-Z, 0-9, _, - and .";
+	}
+	
+	if(!$inputcheck) {
+		gwvpmini_SendMessage("error", "$inputcheckerror");
+		header("Location: $BASE_URL/repos");
+	} else	if(gwvpmini_isLoggedIn()) {
 		//gwvpmini_createGitRepo($name, $ownerid, $desc, $bundle=null, $defaultperms=0)
 		if(gwvpmini_HaveRepo($_REQUEST["reponame"])) {
 			gwvpmini_SendMessage("error", "Repo ".$_REQUEST["reponame"]." already exists");

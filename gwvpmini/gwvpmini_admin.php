@@ -40,7 +40,8 @@ function gwvpmini_AdminMainPageBody()
 {
 	global $BASE_URL;
 	
-	echo "<h2>Users</h2>";
+	$totalusers = gwvpmini_GetNUsers();
+	echo "<h2>Users - $totalusers</h2>";
 	echo "<table border=\"1\">";
 	echo "<tr><th>Username</th><th>Email Address</th><th>Full Name</th><th>Description</th><th>Control</th></tr>";
 	foreach(gwvpmini_GetUsers() as $key => $val) {
@@ -50,6 +51,19 @@ function gwvpmini_AdminMainPageBody()
 		$fn = $val["fullname"];
 		$ds = $val["desc"];
 		echo "<tr><td>$un</td><td>$em</td><td>$fn</td><td>$ds</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
+	}
+	echo "</table>";
+	
+	$totalrepos = gwvpmini_GetNRepos();
+	echo "<h2>Repo's - $totalrepos</h2>";
+	echo "<table border=\"1\">";
+	echo "<tr><th>Repo Name</th><th>Repo Desc</th><th>Owner</th><th>Control</th></tr>";
+	foreach(gwvpmini_GetRepos() as $key => $val) {
+		$id = $key;
+		$rn = $val["name"];
+		$ds = $val["desc"];
+		$ow = $val["owner"];
+		echo "<tr><td>$rn</td><td>$ds</td><td>$ow</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
 	}
 	echo "</table>";
 }

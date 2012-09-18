@@ -3,11 +3,12 @@ GWVP - Mini Version
 
 ALPHA
 
-Original I started GWVP as quite a large php project, then I got stalled with some problems and ultimately
-never really continued with it because I really needed to start from scratch. However it was providing a
-service I ultimately wanted for myself - an entirely web-based git reposity solution. So now i've started
-it again and this time i've got a new set of code starting from a smaller beginning that will then expand
-over time as I work on it.
+Original I started GWVP as quite a large php project, then I got stalled with some 
+problems and ultimately never really continued with it because I really needed to
+start from scratch. However it was providing a service I ultimately wanted for
+myself - an entirely web-based git reposity solution. So now i've started it again
+and this time i've got a new set of code starting from a smaller beginning that 
+will then expand over time as I work on it.
 
 The current version "works", but its ugly as sin.
 

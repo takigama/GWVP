@@ -1,7 +1,7 @@
 <?php
 
 
-$CALL_ME_FUNCTIONS["repoadmin"] = "gwvpmini_SearchCallMe";
+$CALL_ME_FUNCTIONS["search"] = "gwvpmini_SearchCallMe";
 
 // the home_page_provders bit is an array
 

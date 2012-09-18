@@ -84,6 +84,8 @@ function gwvpmini_gitBackendInterface()
 	if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$write = true;
 	}
+	
+	//$write = true;
 	// THIS MAY CAUSE ISSUES LATER ON but we do it cause the git client ignores our 403 when it uses git-receive-pack after an auth
 	// no, this isnt a solution cause auth'd read attempts will come up as writes...
 	//if(isset($_SERVER["PHP_AUTH_USER"])) {
@@ -92,12 +94,16 @@ function gwvpmini_gitBackendInterface()
 	
 	$perms = 5;
 	
+	$write = true;
+	
 	// if its a write, we push for authentication
 	if($write) {
 		error_log("is write attempt, ask for login");
 		$person = gwvpmini_checkBasicAuthLogin();
 		if($person == false) {
+			error_log("person is false, push auth");
 			gwvpmini_AskForBasicAuth();
+			echo "Login";
 			return;
 		} else {
 			error_log("checking perms for $person against $repoid for repo $repo");
@@ -135,117 +141,6 @@ function gwvpmini_gitBackendInterface()
 		return;
 	}
 	
-}
-
-
-function gwvpmini_gitBackendInterface_old()
-{
-	global $BASE_URL;
-	
-	$repo_base = gwvpmini_getConfigVal("repodir");
-	
-	$repo = "";
-	$newloc = "/";
-	if(isset($_REQUEST["q"])) {
-		$query = $_REQUEST["q"];
-		$qspl = explode("/", $query);
-		$repo = $qspl[1];
-		for($i=2; $i < count($qspl); $i++) {
-			$newloc .= "/".$qspl[$i];
-		}
-	}
-	
-	$actual_repo_name = preg_replace("/\.git$/", "", $repo); 
-	
-	$user = gwvpmini_checkBasicAuthLogin();
-
-	if(!$user) {
-		error_log("User is set to false, so its anonymouse");
-	} else {
-		error_log("user is $user");
-	}
-	
-	// must remember that $user of false is anonymous when we code gwvpmini_repoPerm'sCheck()
-	if(!gwvpmini_repoPermissionCheck($actual_repo_name, $user)) {
-		error_log("perms check fails - start auth");
-		if(isset($_SERVER["PHP_AUTH_USER"])) {
-			error_log("have auth - push 403");
-			gwvpmini_fourZeroThree();
-		} else {
-			error_log("push auth");
-			gwvpmini_AskForBasicAuth();
-			return;
-		}
-	}
-	
-	// we need to quite a bit of parsing in here. The "repo" will always be /git/repo.git
-	// but if we get here from a browser, we need to forward back to a normal repo viewer
-	// the only way i can think of doing this is to check the useragent for the word "git"
-	
-	/*
-	 * here we need to
-	 * 1) figure out the repo its acessing
-	 * 2) figure out the perms on the repo
-	 * 3) determine if its a pull or a push
-	 * - if its a pull, we just serve straight from the fs
-	 * - if its a push, we go thru git-http-backend
-	 * 4) if it requiers auth, we push to auth
-	 * 
-	 */
-	$agent = "git-unknown";
-	$isgitagent = false;
-	
-	// tested the user agent bit with jgit from eclipse and normal git... seems to work
-	if(isset($_SERVER["HTTP_USER_AGENT"])) {
-		$agent = $_SERVER["HTTP_USER_AGENT"];
-		error_log("in git backend with user agent $agent");
-		if(stristr($agent, "git")!==false) {
-			$isgitagent = true;
-		}
-	}
-	
-	
-		
-	/* dont need this code right now
-	if($isgitagent) echo "GIT: i am a git backened interface for a repo $repo, agent $agent";
-	else echo "NOT GIT: i am a git backened interface for a repo $repo, agent $agent";
-	*/
-	
-	// now we need to rebuild the actual request or do we?
-	//$basegit = "$BASE_URL/git/something.git";
-	//$newloc = preg_replace("/^$basegit/", "", $_SERVER["REQUEST_URI"]);
-	chdir("$repo_base/$repo");
-	exec("/usr/bin/git update-server-info");
-	
-	if($_SERVER["REQUEST_METHOD"] == "POST") {
-			gwvpmini_AskForBasicAuth();
-			gwvpmini_callGitBackend($repo);
-			return;
-	}
-	
-	if(isset($_REQUEST["service"])) {
-		if($_REQUEST["service"] == "git-receive-pack") {
-			// we are a write call - we need auth and we're going to the backend proper
-			gwvpmini_AskForBasicAuth();
-			gwvpmini_callGitBackend($repo);
-			return;
-		}
-	}
-	
-	
-	if(file_exists("$repo_base/$repo/$newloc")) {
-		error_log("would ask $repo,$actual_repo_name for $repo/$newloc from $repo_base/$repo/$newloc");
-		$fh = fopen("$repo_base/$repo/$newloc", "rb");
-		
-		error_log("pushing file");
-		while(!feof($fh)) {
-			echo fread($fh, 8192);
-		}
-	} else {
-		echo "would ask $repo,$actual_repo_name for $repo/$newloc from $repo_base/$repo/$newloc, NE";
-		header('HTTP/1.0 404 No Such Thing');
-		return;
-	}
 }
 
 function gwvpmini_canManageRepo($userid, $repoid)

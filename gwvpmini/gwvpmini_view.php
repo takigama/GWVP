@@ -51,14 +51,16 @@ function gwvpmini_RepoViewPageBody()
 	$sname = $_SERVER["SERVER_NAME"];
 	
 	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
+	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
 	
 	$owner_name = $owner["username"];
 	
 	error_log("STUFF:".print_r($owner,true));
+	$cloneurl = "git clone $proto$sname$BASE_URL/git/$repo_view_call.git";
+	echo "<textarea rows=1 cols=".strlen($cloneurl).">$cloneurl</textarea><br>";
 	
-	echo "<br><h2>".get_gravatar($owner["email"], 30, 'mm', 'g', true)."$repo_view_call - $owner_name</h2>";
-	echo "<b>Desc</b><br>";
-	echo "<textarea rows=1 cols=100>git clone $proto$sname$BASE_URL/git/$repo_view_call.git</textarea><br>";
+	echo "<h2>".get_gravatar($owner["email"], 30, 'mm', 'g', true)."$repo_view_call - $owner_name</h2>";
+	echo "<b>$desc</b><br>";
 	//echo "command: git log --git-dir=$repo_base/$repo_view_call.git --pretty=format:\"%H\" -10";
 	$rs = popen("git --git-dir=$repo_base/$repo_view_call.git log --pretty=format:\"%H\" -10", "r");
 	$commitids = array();

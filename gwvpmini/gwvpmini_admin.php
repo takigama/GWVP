@@ -51,8 +51,11 @@ function gwvpmini_AdminMainPageBody()
 		$em = $val["email"];
 		$fn = $val["fullname"];
 		$ds = $val["desc"];
-		echo "<tr><td>$un</td><td>$em</td><td>$fn</td><td>$ds</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
+		$unlval = "<a href=\"$BASE_URL/user/$un\">$un</a>";
+		echo "<tr><td>$unlval</td><td>$em</td><td>$fn</td><td>$ds</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
 	}
+	
+	
 	echo "</table>";
 	echo "</td><td>";
 	echo "<h3>Create User</h3>";

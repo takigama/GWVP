@@ -202,7 +202,7 @@ function gwvpmini_LoginBuilder()
 	if($login === false) {
 		gwvpmini_SingleLineLoginForm();
 	} else {
-		echo "Hello ".$_SESSION["fullname"]." <a href=\"$BASE_URL/logout\">logout</a>";
+		echo "Hello <a href=\"$BASE_URL/user/".$_SESSION["username"]."\">".$_SESSION["fullname"]."</a> <a href=\"$BASE_URL/logout\">logout</a>";
 	}
 }
 

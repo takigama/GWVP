@@ -241,6 +241,36 @@ function gwvpmini_GetRepoId($reponame)
 	return $retval;
 }
 
+function gwvpmini_GetRepoDescFromName($reponame)
+{
+
+	/*
+	 * 	$reposql = '
+	CREATE TABLE "repos" (
+			"repos_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+			"repos_name" TEXT,
+			"repos_description" TEXT,
+			"repos_owner" INTEGER
+	)';
+
+	*/
+
+	$conn = gwvpmini_ConnectDB();
+
+	$sql = "select repos_description from repos where repos_name='$reponame'";
+	error_log("desc for name sql: $sql");
+
+	$res = $conn->query($sql);
+
+	$retval = -1;
+	if(!$res) return -1;
+	foreach($res as $row) {
+		$retval = $row[0];
+	}
+
+	return $retval;
+}
+
 function gwvpmini_GetRepoOwnerDetailsFromName($reponame)
 {
 

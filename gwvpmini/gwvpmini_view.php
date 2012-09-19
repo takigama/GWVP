@@ -75,7 +75,6 @@ function gwvpmini_RepoViewPageBody()
 		}
 		fclose($rs);
 	} else {
-		echo "No commit logs yet<br>";
 		$commitids = false;
 	}
 	
@@ -100,6 +99,8 @@ function gwvpmini_RepoViewPageBody()
 			echo "<tr><td>".get_gravatar($flin2, 18, 'mm', 'g', true)."$flon</td><td>$flin1</td><td>$flin4</td></tr>";
 		}
 		echo "</table>";
+	} else {
+		echo "No commit information available yet<br>";
 	}
 }
 

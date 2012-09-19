@@ -224,7 +224,7 @@ function gwvpmini_BodyBuilder()
 // builds the tail structure
 function gwvpmini_TailBuilder()
 {
-	echo "<font size=\"-1\"><i>Copyright 2011, PJR - licensed under GPL</i></font>";
+	echo "<br><br><hr><font size=\"-1\"><b><a href=\"http://github.com/takigama/GWVP\">GWVP</a></b> - <i>Copyright 2011, 2012 PJR - licensed under GPL</i></font>";
 }
 
 function gwvpmini_emailToUserLink($email)

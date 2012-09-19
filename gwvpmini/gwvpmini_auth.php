@@ -88,6 +88,7 @@ function gwvpmini_isLoggedIn()
 	
 	if(isset($_SESSION)) {
 		if(isset($_SESSION["username"])) {
+			if(!gwvpmini_isUserEnabled($_SESSION["id"])) return false;
 			return true;
 		}
 	}
@@ -162,6 +163,24 @@ function gwvpmini_authUserPass($user, $pass)
 	if(sha1($pass)!=$details["password"]) return false;
 	
 	return $details["username"];
+}
+
+function gwvpmini_isUserEnabled($id=-1)
+{
+	if($id == -1) {
+		if(isset($_SESSION)) if(isset($_SESSION["id"])) $id = $_SESSION["id"];
+	}
+	
+	if($id == -1) return false;
+	
+	$lev_t = gwvpmini_getUser(null, null, $id);
+	
+	$lev = $lev_t["status"];
+	
+	if($lev == 0) return true;
+	
+	return false;
+	
 }
 
 ?>

@@ -36,6 +36,9 @@ function gwvpmini_AdminCallMe()
 					if($qspl[1] == "confremoveuser") {
 						return "gwvpmini_ConfRemoveUser";
 					}
+					if($qspl[1] == "switchenable") {
+						return "gwvpmini_SwitchEnableUser";
+					}
 				} else {
 					error_log("i got here, where next?");
 					return "gwvpmini_AdminMainPage";
@@ -94,6 +97,8 @@ function gwvpmini_AdminMainPageBody()
 		$st_t = $val["status"];
 		$st_l = $val["level"];
 		
+		$astat = "0";
+		$cstat = "WTF";
 		$level = "WTF";
 		if($st_l == 0) $level = "User";
 		if($st_l == 1) $level = "Admin";
@@ -101,8 +106,12 @@ function gwvpmini_AdminMainPageBody()
 		$status = "";
 		if($st_t[0] == "1") {
 			$status = ", disabled";
-		}
-		if($st_t[0] == "2") {
+			$astat = 0;
+			$cstat = "Enable";
+		} else if ($st_t[0] == "0") {
+			$astat = 1;
+			$cstat = "Disable";
+		} else 	if($st_t[0] == "2") {
 			$vl = explode(":", $st_t);
 			error_log("VL: ".print_r($vl, true));
 			$status = " Awaiting Confirmation (<a href=\"$BASE_URL/register/confirmreg/".$vl[1]."\">Confirm</a>)";
@@ -111,7 +120,9 @@ function gwvpmini_AdminMainPageBody()
 		$st = "$level$status";
 		
 		$unlval = "<a href=\"$BASE_URL/user/$un\">$un</a>";
-		echo "<tr><td>$unlval</td><td>$em</td><td>$fn</td><td>$ds</td><td>$st</td><td><a href=\"$BASE_URL/admin/removeuser/$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
+		echo "<tr><td>$unlval</td><td>$em</td><td>$fn</td><td>$ds</td><td>$st</td><td><a href=\"$BASE_URL/admin/removeuser/$id\">Remove</a> ";
+		if ($st_t[0] == "0"||$st_t[0] == "1") echo "<a href=\"$BASE_URL/admin/switchenable/$astat/$id\">$cstat</a></td></tr>";
+		else echo "</td></tr>";
 	}
 	
 	
@@ -142,7 +153,7 @@ function gwvpmini_AdminMainPageBody()
 		$rn = $val["name"];
 		$ds = $val["desc"];
 		$ow = $val["owner"];
-		echo "<tr><td><a href=\"$BASE_URL/view/$rn\">$rn</a></td><td>$ds</td><td>$ow</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
+		echo "<tr><td><a href=\"$BASE_URL/view/$rn\">$rn</a></td><td>$ds</td><td>$ow</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/switchenable/$id\">Disable</a></td></tr>";
 	}
 	echo "</table>";
 }
@@ -290,4 +301,37 @@ function gwvpmini_ConfRemoveUser()
 	header("Location: $BASE_URL/admin");
 }
 
+function gwvpmini_SwitchEnableUser()
+{
+	global $BASE_URL;
+	
+	$uid = -1;
+	$newst = -1;
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		if(isset($qspl[2])) {
+			$newst = $qspl[2];
+		}
+		if(isset($qspl[3])) {
+			$uid = $qspl[3];
+		}
+	}
+	
+	if($newst == 1) $stat = "disabled";
+	else $stat = "enabled";
+	
+	if($uid > 0 && ($newst == 1 || $newst == 0)) {
+		$details = gwvpmini_getUser(null, null, $uid);
+		$uname = $details["username"];
+		if($newst == 1) gwvpmini_DisableUser($uid);
+		if($newst == 0) gwvpmini_EnableUser($uid);
+		gwvpmini_SendMessage("info", "User $uname ($uid) has been $stat");
+	} else {
+		gwvpmini_SendMessage("info", "Problem disabling user with uid $uid");
+	}
+	
+	header("Location: $BASE_URL/admin");
+	
+}
 ?>

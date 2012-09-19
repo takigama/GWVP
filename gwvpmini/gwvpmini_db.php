@@ -37,7 +37,7 @@ function gwvpmini_getUser($username=null, $email=null, $id=null)
 	} else if($email != null) {
 		$res = $conn->query("select * from users where user_email='$email'");
 	} else if($id != null) {
-		$res = $conn->query("select * from users where users_id='$id'");
+		$res = $conn->query("select * from users where user_id='$id'");
 	} else return false;
 
 	$returns = false;
@@ -65,6 +65,29 @@ function gwvpmini_RemoveUser($uid)
 	
 	return $conn->query($sql);
 }
+
+function gwvpmini_DisableUser($uid)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	if($uid < 0) return;
+	
+	$sql = "update users set user_status=1 where user_id='$uid'";
+	
+	return $conn->query($sql);
+}
+
+function gwvpmini_EnableUser($uid)
+{
+	$conn = gwvpmini_ConnectDB();
+
+	if($uid < 0) return;
+
+	$sql = "update users set user_status=0 where user_id='$uid'";
+
+	return $conn->query($sql);
+}
+
 
 function gwvpmini_ConnectDB()
 {

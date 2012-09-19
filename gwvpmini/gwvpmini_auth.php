@@ -160,6 +160,8 @@ function gwvpmini_authUserPass($user, $pass)
 		return false;
 	}
 	
+	if(!gwvpmini_isUserEnabled($details["id"])) return false;
+	
 	if(sha1($pass)!=$details["password"]) return false;
 	
 	return $details["username"];

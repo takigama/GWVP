@@ -55,6 +55,57 @@ function gwvpmini_getUser($username=null, $email=null, $id=null)
 
 }
 
+function gwvpmini_getRepo($ownerid=null, $name=null, $id=null)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	/*
+	 * 	$reposql = '
+	CREATE TABLE "repos" (
+	"repos_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"repos_name" TEXT,
+	"repos_description" TEXT,
+	"repos_owner" INTEGER,
+	"repos_readperms" TEXT,
+	UNIQUE(repos_name)
+	)';
+
+	 */
+
+	if($ownerid != null) {
+		$res = $conn->query("select * from repos where repos_owner='$ownerid'");
+	} else if($name != null) {
+		$res = $conn->query("select * from repos where repos_name='$name'");
+	} else if($id != null) {
+		$res = $conn->query("select * from repos where repos_id='$id'");
+	} else return false;
+
+	$returns = false;
+	if(!$res) return false;
+	foreach($res as $u_res) {
+		$returns["id"] = $u_res["repos_id"];
+		$returns["name"] = $u_res["repos_name"];
+		$returns["desc"] = $u_res["repos_description"];
+		$returns["ownerid"] = $u_res["repos_owner"];
+		$returns["perms"] = $u_res["repos_readperms"];
+	}
+
+	return $returns;
+
+}
+
+function gwvpmini_RemoveRepoDB($id)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	if($id < 0) return;
+	
+	$sql = "delete from repos where repos_id='$id'";
+	
+	return $conn->query($sql);
+	
+}
+
 function gwvpmini_RemoveUser($uid)
 {
 	$conn = gwvpmini_ConnectDB();

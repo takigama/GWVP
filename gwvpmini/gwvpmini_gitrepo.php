@@ -186,4 +186,40 @@ function gwvpmini_HaveRepo($reponame)
 	if(file_exists("$repo_base/$reponame.git")) return true;
 }
 
+
+function gwvpmini_RemoveRepo($rid)
+{
+	$repo_base = gwvpmini_getConfigVal("repodir");
+	
+	$repdet = gwvpmini_getRepo(null, null, $rid);
+	
+	$rname = $repdet["name"];
+	
+	error_log("FROM PANTS:".print_r($repdet,true)." ----------- ".print_r($rname, true));
+	
+	if($repdet != false && $rname != "") {
+		if(file_exists("$repo_base/$rname.git")) {
+			// recursive remove - frightening
+			if(gwvpmini_RecursiveDelete("$repo_base/$rname.git")) {
+				gwvpmini_RemoveRepoDB($rid);
+			}
+		}
+	} return false;
+}
+
+function gwvpmini_RecursiveDelete($fpath)
+{
+	error_log("RECURSEDETELE: ".$fpath);
+	if(is_file($fpath)){
+		return @unlink($fpath);
+	}
+	elseif(is_dir($fpath)){
+		$scan = glob(rtrim($fpath,'/').'/*');
+		foreach($scan as $index=>$path){
+			gwvpmini_RecursiveDelete($path);
+		}
+		return @rmdir($fpath);
+	}
+}
+	
 ?>

@@ -33,8 +33,14 @@ function gwvpmini_AdminCallMe()
 					if($qspl[1] == "removeuser") {
 						return "gwvpmini_RemoveUserPage";
 					}
+					if($qspl[1] == "removerepo") {
+						return "gwvpmini_RemoveRepoPage";
+					}
 					if($qspl[1] == "confremoveuser") {
 						return "gwvpmini_ConfRemoveUser";
+					}
+					if($qspl[1] == "confremoverepo") {
+						return "gwvpmini_ConfRemoveRepo";
 					}
 					if($qspl[1] == "switchenable") {
 						return "gwvpmini_SwitchEnableUser";
@@ -50,6 +56,13 @@ function gwvpmini_AdminCallMe()
 
 	return false;
 }
+
+function gwvpmini_RemoveRepoPage()
+{
+	gwvpmini_goMainPage("gwvpmini_RemoveRepoPageBody");
+
+}
+
 
 function gwvpmini_RemoveUserPage()
 {
@@ -153,7 +166,13 @@ function gwvpmini_AdminMainPageBody()
 		$rn = $val["name"];
 		$ds = $val["desc"];
 		$ow = $val["owner"];
-		echo "<tr><td><a href=\"$BASE_URL/view/$rn\">$rn</a></td><td>$ds</td><td>$ow</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/switchenable/$id\">Disable</a></td></tr>";
+		$udet = gwvpmini_getUser(null, null, $ow);
+		if(!$udet) {
+			$owl = "Orphaned";
+		} else {
+			$owl = $udet["username"]." (".$udet["id"].") - ".$udet["fullname"]." (".$udet["email"].") - <a href=\"mailto:".$udet["email"]."\">Email Owner</a>";
+		}
+		echo "<tr><td><a href=\"$BASE_URL/view/$rn\">$rn</a></td><td>$ds</td><td>$owl</td><td><a href=\"$BASE_URL/admin/removerepo/$id\">Remove</a> <a href=\"$BASE_URL/admin/switchenable/$id\">Disable</a></td></tr>";
 	}
 	echo "</table>";
 }
@@ -274,6 +293,78 @@ function gwvpmini_RemoveUserPageBody()
 		echo "<a href=\"$BASE_URL/admin\">Go Back</a>";
 	}
 	
+}
+
+function gwvpmini_RemoveRepoPageBody()
+{
+	global $BASE_URL;
+
+	$rid = -1;
+	$uid = -1;
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		if(isset($qspl[2])) {
+			$rid = $qspl[2];
+		}
+	}
+	
+	$repdet = gwvpmini_getRepo(null, null, $rid);
+	if($repdet != false) $uid = $repdet["ownerid"];
+	$usedet = gwvpmini_getUser(null, null, $uid);
+	
+
+	if($rid != -1) {
+		$rname = $repdet["name"];
+		$rdesc = $repdet["desc"];
+		if($usedet == false) {
+			$ownedby = "which is unowned (Orphaned)";
+		} else {
+			$ownedby = "owned by <b>$username</b> ($uid) - \"$fullname\"";
+		}
+		$username = $usedet["username"];
+		$fullname = $usedet["fullname"];
+		
+
+		error_log("user dets:".print_r($details, true));
+
+		echo "<h2>Remove User?</h2>";
+		echo "Are you sure you wish to remove the repo, <b>$rname</b> ($rid) - \"$rdesc\" $ownedby?<br>";
+		echo "<a href=\"$BASE_URL/admin/confremoverepo/$rid\">Yes</a> <a href=\"$BASE_URL/admin\">No</a><br>";
+	} else {
+		echo "<h2>How?</h2>";
+		echo "You got here in a weird way or the uid of the repo you were trying to delete is invalid<br>";
+		echo "<a href=\"$BASE_URL/admin\">Go Back</a>";
+	}
+
+}
+
+function gwvpmini_ConfRemoveRepo()
+{
+	global $BASE_URL;
+
+	
+	error_log("CONF REMOVE REPO");
+	
+	$rid = -1;
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		if(isset($qspl[2])) {
+			$rid = $qspl[2];
+		}
+	}
+
+	if($rid > 0) {
+		$details = gwvpmini_getRepo(null, null, $rid);
+		$rname = $details["name"];
+		gwvpmini_RemoveRepo($rid);
+		gwvpmini_SendMessage("info", "Repo $rname ($rid) has been removed");
+	} else {
+		gwvpmini_SendMessage("info", "Problem deleteing repo with rid $rid");
+	}
+
+	header("Location: $BASE_URL/admin");
 }
 
 function gwvpmini_ConfRemoveUser()

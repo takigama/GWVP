@@ -55,6 +55,7 @@ function gwvpmini_getUser($username=null, $email=null, $id=null)
 
 }
 
+
 function gwvpmini_getRepo($ownerid=null, $name=null, $id=null)
 {
 	$conn = gwvpmini_ConnectDB();
@@ -505,16 +506,19 @@ function gwvpmini_GetOwnedRepos($username)
 	 */
 	$conn = gwvpmini_ConnectDB();
 	
+	
 	$uid = gwvpmini_GetUserId($username);
 	$sql = "select * from repos where repos_owner='$uid'";
-	error_log("owned repos sql $sql");
+	error_log("owned repos sql $sql for username $username");
 	$res = $conn->query($sql);
+	if($username == "") return false;
 	
 	$retval = false;
 	foreach($res as $row) {
 		$id = $row["repos_id"];
 		$retval[$id]["name"] = $row["repos_name"];
 		$retval[$id]["desc"] = $row["repos_description"];
+		$retval[$id]["id"] = $row["repos_id"];
 		error_log(print_r($row, true));
 	}
 	
@@ -569,8 +573,40 @@ function gwvpmini_GetUsers($startat = 0, $num = 10)
 		$retval[$id]["desc"] = $row["user_desc"];
 		$retval[$id]["level"] = $row["user_level"];
 		$retval[$id]["status"] = $row["user_status"];
+		$retval[$id]["id"] = $row["user_id"];
 	}
 	
+	return $retval;
+}
+
+function gwvp_findPeopleLike($search)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "select * from users where user_username like '%$search%' or user_full_name like '%$search%'";
+	
+	$res = $conn->query($sql);
+	
+	if(!$res) {
+		error_log("SERACHUSER: $sql returned false");
+		return false;
+	} else {
+		error_log("SERACHUSER: $sql returned true");
+	}
+	
+	$retval = false;
+	foreach($res as $row) {
+		$id = $row["user_id"];
+		$retval[$id]["fullname"] = $row["user_full_name"];
+		$retval[$id]["username"] = $row["user_username"];
+		$retval[$id]["email"] = $row["user_email"];
+		$retval[$id]["desc"] = $row["user_desc"];
+		$retval[$id]["level"] = $row["user_level"];
+		$retval[$id]["status"] = $row["user_status"];
+		$retval[$id]["id"] = $row["user_id"];
+	}
+	
+	error_log("SEARCHUSER: array is ".print_r($retval, true));
 	return $retval;
 }
 
@@ -598,10 +634,44 @@ function gwvpmini_GetRepos($startat=0, $num=200)
 		$retval[$id]["name"] = $row["repos_name"];
 		$retval[$id]["desc"] = $row["repos_description"];
 		$retval[$id]["owner"] = $row["repos_owner"];
+		$retval[$id]["id"] = $row["repos_id"];
 	}
 	
 	return $retval;
 	
+	
+}
+
+function gwvp_findReposLike($search)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	/*
+	 * 	CREATE TABLE "repos" (
+	"repos_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"repos_name" TEXT,
+	"repos_description" TEXT,
+	"repos_owner" INTEGER
+	)';
+	
+	 		*/
+	
+	$sql = "select * from repos where repos_name like '%$search%' or repos_description like '%$search%'";
+	
+	$res = $conn->query($sql);
+	
+	if(!$res) return false;
+	
+	$retval = false;
+	foreach($res as $row) {
+		$id = $row["repos_id"];
+		$retval[$id]["name"] = $row["repos_name"];
+		$retval[$id]["desc"] = $row["repos_description"];
+		$retval[$id]["owner"] = $row["repos_owner"];
+		$retval[$id]["id"] = $row["repos_id"];
+	}
+	
+	return $retval;
 	
 }
 

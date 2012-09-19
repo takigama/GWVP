@@ -70,15 +70,16 @@ function gwvpmini_SingleLineLoginForm()
 	global $BASE_URL;
 
 	echo "<form method=\"post\" action=\"$BASE_URL/login\">Username <input type=\"text\" name=\"username\" class=\"login\">";
-	echo " Passowrd <input type=\"text\" name=\"password\" class=\"login\"><input type=\"submit\" name=\"login\" value=\"Login\" class=\"loginbutton\">";
+	echo " Passowrd <input type=\"password\" name=\"password\" class=\"login\"><input type=\"submit\" name=\"login\" value=\"Login\" class=\"loginbutton\">";
 	if(gwvpmini_IsRegistrationEnabled()) echo "<a href=\"$BASE_URL/register\">Register</a></form>";
-	else echo "</form><br>";
+	else echo "</form>";
 }
 
 
 function gwvpmini_IsRegistrationEnabled()
 {
-	return true;
+	global $can_register;
+	return $can_register;
 }
 
 function gwvpmini_isLoggedIn()

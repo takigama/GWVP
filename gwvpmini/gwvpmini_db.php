@@ -55,6 +55,17 @@ function gwvpmini_getUser($username=null, $email=null, $id=null)
 
 }
 
+function gwvpmini_RemoveUser($uid)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	if($uid < 0) return;
+	
+	$sql = "delete from users where user_id='$uid'";
+	
+	return $conn->query($sql);
+}
+
 function gwvpmini_ConnectDB()
 {
 	global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name, $DB_CONNECTION;
@@ -85,6 +96,27 @@ function gwvpmini_ConnectDB()
 
 	return $DB_CONNECTION;
 }
+
+function gwvpmini_UpdateStatusFromConfirm($confirmhash)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "select count(*) from users where user_status='2:$confirmhash'";
+	
+	$res = $conn->query($sql);
+	
+	if(!$res) return false;
+	
+	foreach($res as $row) {
+		$retval = $row[0];
+	}
+	
+	if($retval > 0) {
+		$sql = "update users set user_status='0' where user_status='2:$confirmhash'";
+		return $conn->query($sql);
+	} else return false;
+}
+
 
 function gwvpmini_AddUser($username, $password, $fullname, $email, $desc, $level, $status)
 {
@@ -331,6 +363,9 @@ function gwvpmini_setConfigVal($confname, $confval)
 	gwvpmini_eraseConfigVal($confname);
 
 	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "delete from config where config_name='$confname'";
+	$conn->query($sql);
 
 	$sql = "insert into config values('$confname', '$confval')";
 
@@ -447,7 +482,7 @@ function gwvpmini_GetUsers($startat = 0, $num = 10)
 
 	 */
 	
-	$sql = "select * from users where user_id>'$startat' order by user_id asc limit $num";
+	$sql = "select * from users where user_id>='$startat' order by user_id asc limit $num";
 	
 	$res = $conn->query($sql);
 	

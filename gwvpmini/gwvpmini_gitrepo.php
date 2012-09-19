@@ -53,8 +53,8 @@ function gwvpmini_RepoMainPageBody()
 {
 	global $BASE_URL;
 	
-	gwvpmini_GitCreateRepoForm();
 	if(gwvpmini_isLoggedIn()) {
+		gwvpmini_GitCreateRepoForm();
 		$repos = gwvpmini_GetOwnedRepos($_SESSION["username"]);
 		if(!$repos) {
 			echo "You currently own no repos<br>";	

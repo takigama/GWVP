@@ -80,7 +80,7 @@ function gwvpmini_AdminMainPageBody()
 		$rn = $val["name"];
 		$ds = $val["desc"];
 		$ow = $val["owner"];
-		echo "<tr><td>$rn</td><td>$ds</td><td>$ow</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
+		echo "<tr><td><a href=\"$BASE_URL/view/$rn\">$rn</a></td><td>$ds</td><td>$ow</td><td><a href=\"$BASE_URL/admin/removeuser&id=$id\">Remove</a> <a href=\"$BASE_URL/admin/disableuser&id=$id\">Disable</a></td></tr>";
 	}
 	echo "</table>";
 }

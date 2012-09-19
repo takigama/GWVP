@@ -42,10 +42,53 @@ function gwvpmini_RepoViewPage()
 
 function gwvpmini_RepoViewPageBody()
 {
-	global $repo_view_call, $MENU_ITEMS;
-
+	global $repo_view_call, $MENU_ITEMS, $BASE_URL;
 	
-	echo "In repoview call for $repo_view_call";
+	$repo_base = gwvpmini_getConfigVal("repodir");
+
+	if($_SERVER["SERVER_PORT"] == 443) $proto="https://";
+	else $proto = "http://";
+	$sname = $_SERVER["SERVER_NAME"];
+	
+	echo "<br><h2>$repo_view_call by owner</h2>";
+	echo "<b>Desc</b><br>";
+	echo "<textarea rows=1 cols=100>git clone $proto$sname$BASE_URL/git/$repo_view_call.git</textarea><br>";
+	//echo "command: git log --git-dir=$repo_base/$repo_view_call.git --pretty=format:\"%H\" -10";
+	$rs = popen("git --git-dir=$repo_base/$repo_view_call.git log --pretty=format:\"%H\" -10", "r");
+	$commitids = array();
+	$i = 0;
+	if($rs) {
+		while(!feof($rs)) {
+			$flin = fgets($rs);
+			if($flin !== false) {
+				$commitids[$i] = trim($flin);
+				$i++;
+			}
+		}
+		fclose($rs);
+	} else {
+		echo "No commit logs yet<br>";
+		$commitids = false;
+	}
+	
+	if($commitids != false) {
+		echo "<hr>Commits<br>";
+		echo "<table border=\"1\">";
+		echo "<tr><th>Committed By</th><th>Date</th><th>Commit Log Entry</th></tr>";
+		foreach($commitids as $ids) {
+			$rs = popen("git --git-dir=$repo_base/$repo_view_call.git log --pretty=format:\"%at%n%ce%n%s\" $ids -1", "r");
+			if($rs) {
+				$flin1 = trim(fgets($rs));
+				$flin2 = gwvpmini_emailToUserLink(trim(fgets($rs)));
+				while(!feof($rs)) {
+					$flin3 = fread($rs, 8192);
+				}
+			}
+			echo "<tr><td>$flin2</td><td>$flin1</td><td>$flin3</td></tr>";
+		}
+		echo "</table>";
+	}
+	
 }
 
 

@@ -110,7 +110,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	
 	echo "</tr>";
 	
-	echo "<tr><td>";
+	echo "<tr><td colspan=\"2\">";
 	if($bodyFunction == null) {
 		gwvpmini_BodyBuilder();
 	} else {
@@ -225,6 +225,19 @@ function gwvpmini_BodyBuilder()
 function gwvpmini_TailBuilder()
 {
 	echo "<font size=\"-1\"><i>Copyright 2011, PJR - licensed under GPL</i></font>";
+}
+
+function gwvpmini_emailToUserLink($email)
+{
+	global $BASE_URL;
+	
+	$username = gwvpmini_GetUserNameFromEmail($username);
+	
+	if($username !== false) {
+		return "<a href=\"$BASE_URL/user/$username\">$username</a>";
+	} else {
+		return "Uknown";
+	}
 }
 
 function gwvpmini_fourZeroThree()

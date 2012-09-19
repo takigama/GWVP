@@ -290,6 +290,23 @@ function gwvpmini_GetUserId($username)
 	return $retval;
 }
 
+function gwvpmini_GetUserNameFromEmail($email)
+{
+	$conn = gwvpmini_ConnectDB();
+
+	$sql = "select user_username from users where user_email='$email'";
+
+	error_log("username sql $sql");
+
+	$res = $conn->query($sql);
+
+	$retval = false;
+	foreach($res as $row) {
+		$retval = $row[0];
+	}
+
+	return $retval;
+}
 function gwvpmini_GetOwnedRepos($username)
 {
 	/*

@@ -50,7 +50,13 @@ function gwvpmini_RepoViewPageBody()
 	else $proto = "http://";
 	$sname = $_SERVER["SERVER_NAME"];
 	
-	echo "<br><h2>$repo_view_call by owner</h2>";
+	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
+	
+	$owner_name = $owner["username"];
+	
+	error_log("STUFF:".print_r($owner,true));
+	
+	echo "<br><h2>".get_gravatar($owner["email"], 30, 'mm', 'g', true)."$repo_view_call - $owner_name</h2>";
 	echo "<b>Desc</b><br>";
 	echo "<textarea rows=1 cols=100>git clone $proto$sname$BASE_URL/git/$repo_view_call.git</textarea><br>";
 	//echo "command: git log --git-dir=$repo_base/$repo_view_call.git --pretty=format:\"%H\" -10";

@@ -241,6 +241,52 @@ function gwvpmini_GetRepoId($reponame)
 	return $retval;
 }
 
+function gwvpmini_GetRepoOwnerDetailsFromName($reponame)
+{
+
+	/*
+	 * 	$reposql = '
+	CREATE TABLE "repos" (
+			"repos_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+			"repos_name" TEXT,
+			"repos_description" TEXT,
+			"repos_owner" INTEGER
+	)';
+	
+		"user_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"user_full_name" TEXT,
+	"user_password" TEXT,
+	"user_username" TEXT,
+	"user_email" TEXT,
+	"user_desc" TEXT,
+	"user_level" TEXT,
+	"user_status" TEXT,
+	UNIQUE(user_username)
+
+	*/
+
+	$conn = gwvpmini_ConnectDB();
+
+	$sql = "select users.* from repos,users where repos_name='$reponame' and repos_owner=user_id";
+
+	$res = $conn->query($sql);
+
+	$retval = -1;
+	if(!$res) return -1;
+	foreach($res as $row) {
+		$retval = array();
+		error_log("STUFF2: ".print_r($row,true));
+		$retval["id"] = $row["user_id"];
+		$retval["fullname"] = $row["user_full_name"];
+		$retval["username"] = $row["user_username"];
+		$retval["email"] = $row["user_email"];
+		$retval["desc"] = $row["user_desc"];
+		$retval["level"] = $row["user_level"];
+		$retval["status"] = $row["user_status"];
+	}
+
+	return $retval;
+}
 
 function gwvpmini_setConfigVal($confname, $confval)
 {

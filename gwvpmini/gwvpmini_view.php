@@ -76,19 +76,23 @@ function gwvpmini_RepoViewPageBody()
 		echo "<table border=\"1\">";
 		echo "<tr><th>Committed By</th><th>Date</th><th>Commit Log Entry</th></tr>";
 		foreach($commitids as $ids) {
-			$rs = popen("git --git-dir=$repo_base/$repo_view_call.git log --pretty=format:\"%at%n%ce%n%s\" $ids -1", "r");
+			$rs = popen("git --git-dir=$repo_base/$repo_view_call.git log --pretty=format:\"%at%n%ce%n%an%n%s\" $ids -1", "r");
 			if($rs) {
 				$flin1 = trim(fgets($rs));
-				$flin2 = gwvpmini_emailToUserLink(trim(fgets($rs)));
+				$flin2 = trim(fgets($rs));
+				$flin3 = trim(fgets($rs));
 				while(!feof($rs)) {
-					$flin3 = fread($rs, 8192);
+					$flin4 = fread($rs, 8192);
+				}
+				$flon =  gwvpmini_emailToUserLink($flin2);
+				if(!$flon) {
+					$flon = "$flin3 (external)";
 				}
 			}
-			echo "<tr><td>$flin2</td><td>$flin1</td><td>$flin3</td></tr>";
+			echo "<tr><td>".get_gravatar($flin2, 18, 'mm', 'g', true)."$flon</td><td>$flin1</td><td>$flin4</td></tr>";
 		}
 		echo "</table>";
 	}
-	
 }
 
 

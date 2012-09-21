@@ -122,7 +122,11 @@ function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
 		$permsarray[$uid] = $acc;
 	} else {
 		$permsarray = unserialize(base64_decode($cperms_t));
-		$permsarray[$uid] = $acc; 
+		$permsarray[$uid] = $acc;
+		if($acc == 0) {
+			error_log("PERMSUPDATE: REMOVE $uid");
+			unset($permsarray[$uid]);
+		}
 	}
 	
 	// check if base is now r or a, we can drop any 1's
@@ -155,15 +159,11 @@ function gwvpmini_GetRepoPerms($rid)
 		$cperms_t = $row[0];
 	}
 	
-	if($cperms_t === false) return 0;
-	
-	error_log("PERMSCHECK $rid, $uid:".print_r($dets, true));
-	
-	if($dets === false) return 0;
-	
-	if($dets["ownerid"] == $uid) return 2;
+	if($cperms_t === false) return false;
 	
 	$permsarray = unserialize(base64_decode($cperms_t));
+	
+	return $permsarray;
 }
 
 //returns 0 for none, 1 for read, 2 for writes

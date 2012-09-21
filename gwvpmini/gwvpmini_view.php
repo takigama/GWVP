@@ -24,6 +24,18 @@ function gwvpmini_RepoViewCallMe()
 			if($qspl[0] == "updaterepobaseperms") {
 				return "gwvpmini_UpdateRepoBasePerms";
 			} 
+			if($qspl[0] == "repoaddreader") {
+				return "gwvpmini_AddRepoReader";
+			}
+			if($qspl[0] == "repoaddcontrib") {
+				return "gwvpmini_AddRepoContributor";
+			}
+			if($qspl[0] == "reporemovereaders") {
+				return "gwvpmini_RemoveRepoReader";
+			}
+			if($qspl[0] == "reporemovecontribs") {
+				return "gwvpmini_RemoveRepoContributor";
+			}
 			return false;
 		}
 		else return false;
@@ -80,7 +92,9 @@ function gwvpmini_RepoViewPageBody()
 	echo "<b>$desc</b><br>";
 	
 	if($owner_view) {
-		$bperms = gwvpmini_GetRepoPerm(gwvpmini_GetRepoId($repo_view_call), "b");
+		$bperms_f = gwvpmini_GetRepoPerms(gwvpmini_GetRepoId($repo_view_call));
+		
+		$bperms = $bperms_f["b"];
 		
 		$anyo = "";
 		$regd = "";
@@ -104,13 +118,36 @@ function gwvpmini_RepoViewPageBody()
 		echo "<input type=\"submit\" name=\"Set\" value=\"Set\">";
 		echo "</form>";
 		if($bperms == "x") {
-			echo "</td><td>Readers<br>";
+			echo "</td><td><b>Readers</b><br>";
+			echo "<form method=\"post\" action=\"$BASE_URL/reporemovereaders/$repo_view_call\">";
+			$nl = 0;
+			foreach($bperms_f as $key=>$val) {
+				if($val == 1) {
+					$dets = gwvpmini_getUser(null, null, $key);
+					echo get_gravatar($dets["email"], 18, 'mm', 'g', true)." <input type=\"checkbox\" name=\"$key\"> ".$dets["username"]."<br>";
+					$nl = 1;
+				}
+			}
+			if($nl==1) echo "<input type=\"submit\" name=\"remove\" value=\"Remove Selected\">";
+			echo "</form>";
 			echo "<form method=\"post\" action=\"$BASE_URL/repoaddreader/$repo_view_call\">";
 			echo "<input type=\"text\" name=\"readerusername\"> <input type=\"submit\" name=\"Add\" value=\"Add\">";
 			echo "</form><br>";
 		}
 		
-		echo "</td><td>Contributors";
+		echo "</td><td><b>Contributors</b><br>";
+		echo "<form method=\"post\" action=\"$BASE_URL/reporemovecontribs/$repo_view_call\">";
+		$nl = 0;
+		foreach($bperms_f as $key=>$val) {
+			if($val == 2) {
+				$dets = gwvpmini_getUser(null, null, $key);
+				echo get_gravatar($dets["email"], 18, 'mm', 'g', true)." <input type=\"checkbox\" name=\"$key\"> ".$dets["username"]."<br>";
+				$nl = 1;
+			}
+		}
+		if($nl==1) echo "<input type=\"submit\" name=\"remove\" value=\"Remove Selected\">";
+		echo "</form>";
+		
 		echo "<form method=\"post\" action=\"$BASE_URL/repoaddcontrib/$repo_view_call\">";
 		echo "<input type=\"text\" name=\"contribusername\"> <input type=\"submit\" name=\"Add\" value=\"Add\">";
 		echo "</form><br>";
@@ -202,6 +239,241 @@ function gwvpmini_UpdateRepoBasePerms()
 	}
 	
 	header("Location: $BASE_URL/view/$repo_view_call");
+}
+
+function gwvpmini_AddRepoReader()
+{
+	global $BASE_URL, $repo_view_call;
+	
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		error_log("PLOOP:qview".print_r($qspl, true));
+	}
+	
+	if(isset($qspl[1])) $repo_view_call = $qspl[1];
+	else {
+		error_log("PLOOP: no repo name");
+		// TODO: btw, this makes no sense
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	$newperms = $_REQUEST["base_perms"];
+	
+	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
+	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
+	
+	$owner_name = $owner["username"];
+	
+	$owner_view = false;
+	if(isset($_SESSION["id"])) {
+		if($owner["id"] == $_SESSION["id"]) {
+			$owner_view = true;
+		}
+	}
+	if(!$owner_view) {
+		gwvpmini_SendMessage("error", "failure updating permission for repo");
+		error_log("PLOOP: attempt to update from non-owner");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	$auid = gwvpmini_GetUserId($_REQUEST["readerusername"]);
+	
+	if($auid == $_SESSION["id"]) {
+		gwvpmini_SendMessage("error", "You cannot add yourself as a reader as you already own the repo");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	if($auid > 0)  {
+		$rid = gwvpmini_GetRepoId($repo_view_call);
+		
+		gwvpmini_ChangeRepoPerm($rid, $auid, 1);
+		gwvpmini_SendMessage("info", "Added user ".$_REQUEST["readerusername"]." as a reader");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	} else {
+		gwvpmini_SendMessage("error", "Couldnt find user with username of ".$_REQUEST["readerusername"]);
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	
+}
+
+function gwvpmini_AddRepoContributor()
+{
+	global $BASE_URL, $repo_view_call;
+	
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		error_log("PLOOP:qview".print_r($qspl, true));
+	}
+	
+	if(isset($qspl[1])) $repo_view_call = $qspl[1];
+	else {
+		error_log("PLOOP: no repo name");
+		// TODO: btw, this makes no sense
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	$newperms = $_REQUEST["base_perms"];
+	
+	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
+	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
+	
+	$owner_name = $owner["username"];
+	
+	$owner_view = false;
+	if(isset($_SESSION["id"])) {
+		if($owner["id"] == $_SESSION["id"]) {
+			$owner_view = true;
+		}
+	}
+	if(!$owner_view) {
+		gwvpmini_SendMessage("error", "failure updating permission for repo");
+		error_log("PLOOP: attempt to update from non-owner");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	$auid = gwvpmini_GetUserId($_REQUEST["contribusername"]);
+	
+	if($auid == $_SESSION["id"]) {
+		gwvpmini_SendMessage("error", "You cannot add yourself as a contributor as you already own the repo");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	if($auid > 0)  {
+		$rid = gwvpmini_GetRepoId($repo_view_call);
+	
+		gwvpmini_ChangeRepoPerm($rid, $auid, 2);
+		gwvpmini_SendMessage("info", "Added user ".$_REQUEST["contribusername"]." as a contributor");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	} else {
+		gwvpmini_SendMessage("error", "Couldnt find user with username of ".$_REQUEST["contribusername"]);
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+}
+
+function gwvpmini_RemoveRepoContributor()
+{
+	
+	global $BASE_URL, $repo_view_call;
+	
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		error_log("PLOOP:qview".print_r($qspl, true));
+	}
+	
+	if(isset($qspl[1])) $repo_view_call = $qspl[1];
+	else {
+		error_log("PLOOP: no repo name");
+		// TODO: btw, this makes no sense
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	
+	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
+	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
+	
+	$owner_name = $owner["username"];
+	
+	$owner_view = false;
+	if(isset($_SESSION["id"])) {
+		if($owner["id"] == $_SESSION["id"]) {
+			$owner_view = true;
+		}
+	}
+	if(!$owner_view) {
+		gwvpmini_SendMessage("error", "failure updating permission for repo");
+		error_log("PLOOP: attempt to update from non-owner");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	$rid = gwvpmini_GetRepoId($repo_view_call);
+	
+	$bperms_f = gwvpmini_GetRepoPerms($rid);
+	
+	foreach($bperms_f as $key=>$val) {
+		if($val == 2) {
+			if(isset($_REQUEST["$key"])) {
+				gwvpmini_ChangeRepoPerm($rid, $key, 0);
+			}
+		}
+	}
+	
+	gwvpmini_SendMessage("info", "Repo permissions updated");
+	header("Location: $BASE_URL/view/$repo_view_call");
+	return;
+	
+}
+
+
+function gwvpmini_RemoveRepoReader()
+{
+
+	global $BASE_URL, $repo_view_call;
+
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		error_log("PLOOP:qview".print_r($qspl, true));
+	}
+
+	if(isset($qspl[1])) $repo_view_call = $qspl[1];
+	else {
+		error_log("PLOOP: no repo name");
+		// TODO: btw, this makes no sense
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+
+
+	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
+	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
+
+	$owner_name = $owner["username"];
+
+	$owner_view = false;
+	if(isset($_SESSION["id"])) {
+		if($owner["id"] == $_SESSION["id"]) {
+			$owner_view = true;
+		}
+	}
+	if(!$owner_view) {
+		gwvpmini_SendMessage("error", "failure updating permission for repo");
+		error_log("PLOOP: attempt to update from non-owner");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+
+	$rid = gwvpmini_GetRepoId($repo_view_call);
+
+	$bperms_f = gwvpmini_GetRepoPerms($rid);
+
+	foreach($bperms_f as $key=>$val) {
+		if($val == 1) {
+			if(isset($_REQUEST["$key"])) {
+				gwvpmini_ChangeRepoPerm($rid, $key, 0);
+			}
+		}
+	}
+
+	gwvpmini_SendMessage("info", "Repo permissions updated");
+	header("Location: $BASE_URL/view/$repo_view_call");
+	return;
+
 }
 
 ?>

@@ -142,6 +142,30 @@ function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
 	
 }
 
+function gwvpmini_GetRepoPerms($rid)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "select repos_perms from repos where repos_id='$rid'";
+	
+	$res = $conn->query($sql);
+	
+	$cperms_t = false;
+	if($res !== false) foreach($res as $row) {
+		$cperms_t = $row[0];
+	}
+	
+	if($cperms_t === false) return 0;
+	
+	error_log("PERMSCHECK $rid, $uid:".print_r($dets, true));
+	
+	if($dets === false) return 0;
+	
+	if($dets["ownerid"] == $uid) return 2;
+	
+	$permsarray = unserialize(base64_decode($cperms_t));
+}
+
 //returns 0 for none, 1 for read, 2 for writes
 function gwvpmini_GetRepoPerm($rid, $uid)
 {
@@ -152,8 +176,6 @@ function gwvpmini_GetRepoPerm($rid, $uid)
 	$sql = "select repos_perms from repos where repos_id='$rid'";
 	
 	$res = $conn->query($sql);
-	
-	error_log("PERMCHECK: FUCK U! $sql");
 	
 	$cperms_t = false;
 	if($res !== false) foreach($res as $row) {

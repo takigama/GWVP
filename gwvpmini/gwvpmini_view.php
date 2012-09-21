@@ -91,8 +91,11 @@ function gwvpmini_RepoViewPageBody()
 		
 		error_log("BPERMS: $bperms");
 		
+		if($bperms == "x") $cspan = 3;
+		else $cspan = 2;
+		
+		echo "<table border=\"1\"><tr valign=\"top\"><tr><th colspan=\"$cspan\">Permissions</th></tr><td>";
 		echo "<form method=\"post\" action=\"$BASE_URL/updaterepobaseperms/$repo_view_call\">";
-		echo "Base Permissions ";
 		echo "<select name=\"base_perms\">";
 		echo "<option value=\"a\"$anyo>Anyone can read</option>";
 		echo "<option value=\"r\"$regd>Only registered users can read</option>";
@@ -100,6 +103,18 @@ function gwvpmini_RepoViewPageBody()
 		echo "</select>";
 		echo "<input type=\"submit\" name=\"Set\" value=\"Set\">";
 		echo "</form>";
+		if($bperms == "x") {
+			echo "</td><td>Readers<br>";
+			echo "<form method=\"post\" action=\"$BASE_URL/repoaddreader/$repo_view_call\">";
+			echo "<input type=\"text\" name=\"readerusername\"> <input type=\"submit\" name=\"Add\" value=\"Add\">";
+			echo "</form><br>";
+		}
+		
+		echo "</td><td>Contributors";
+		echo "<form method=\"post\" action=\"$BASE_URL/repoaddcontrib/$repo_view_call\">";
+		echo "<input type=\"text\" name=\"contribusername\"> <input type=\"submit\" name=\"Add\" value=\"Add\">";
+		echo "</form><br>";
+		echo "</td></tr></table>";
 	}
 	//echo "command: git log --git-dir=$repo_base/$repo_view_call.git --pretty=format:\"%H\" -10";
 	$rs = popen("git --git-dir=$repo_base/$repo_view_call.git log --pretty=format:\"%H\" -10", "r");

@@ -243,13 +243,13 @@ function gwvpmini_emailToUserLink($email)
 function gwvpmini_fourZeroThree()
 {
 	error_log("403 called");
-	header("HTTP/1.0 403 Permission Denied");
+	header("HTTP/1.1 403 Permission Denied");
 }
 
 function gwvpmini_fourZeroFour()
 {
 	error_log("404 called");
-	header("HTTP/1.0 404 No Such Thing");
+	header("HTTP/1.1 404 No Such Thing");
 }
 
 

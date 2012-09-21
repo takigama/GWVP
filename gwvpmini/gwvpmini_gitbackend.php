@@ -92,40 +92,50 @@ function gwvpmini_gitBackendInterface()
 		//$write = true;
 	//}
 	
-	$perms = 5;
 	
+	$person = gwvpmini_checkBasicAuthLogin();
 	//$write = true;
+	// next, figure out permissions for repo
+	$rid = gwvpmini_GetRepoId($repo);
+	$uid = -1;
+	error_log("AT THIS POINT WE HAVE $uid, $rid, $repo $person");
+	
+	if(!$person) {
+		if($write) {
+			error_log("ASK FOR BASIC AUTH");
+			gwvpmini_AskForBasicAuth();
+			return;
+		} else {
+			$perm = gwvpmini_GetRepoPerm($rid, "a");
+			if($perm < 1) {
+				error_log("ASK FOR BASIC AUTH 2");
+				gwvpmini_AskForBasicAuth();
+				return;
+			}
+		}
+	} else {
+		$uid = gwvpmini_GetUserId($person);
+		$perm = gwvpmini_GetRepoPerm($rid, $uid);
+		if($write) {
+			if($perm < 2) {
+				error_log("SEND FOFF");
+				gwvpmini_fourZeroThree();
+				return;
+			}
+		} else {
+			if($perm < 1) {
+				gwvpmini_fourZeroThree();
+				return;
+			}
+		}
+	}
 	
 	// if its a write, we push for authentication
 	if($write) {
-		error_log("is write attempt, ask for login");
-		$person = gwvpmini_checkBasicAuthLogin();
-		if($person == false) {
-			error_log("person is false, push auth");
-			gwvpmini_AskForBasicAuth();
-			echo "Login";
-			return;
-		} else {
-			error_log("checking perms for $person against $repoid for repo $repo");
-			// here we pass to the git backend
-			error_log("perms are $perms and im allowed");
-			gwvpmini_callGitBackend($person["username"], $repo);
-		}
+		gwvpmini_callGitBackend($person, $repo);
 		return;
 	}
-	
-	
-	// if they're less then read, we need to then check the user auth permissions
-	if($perms < 2) {
-		// we ask for auth
-		$person = gwvpmini_checkBasicAuthLogin();
-		if($person == false) {
-			gwvpmini_AskForBasicAuth();
-			return;
-		} else {
-		}
-	}
-	
+
 	// if we made it this far, we a read and we have permissions to do so, just search the file from the repo
 	if(file_exists("$repo_base/$repo.git/$newloc")) {
 		error_log("would ask $repo for $repo.git/$newloc from $repo_base/$repo.git/$newloc");

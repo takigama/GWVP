@@ -31,6 +31,14 @@ function gwvpmini_gitBackendInterface()
 	// and this is where i re-code the git backend interface from scratch
 	global $BASE_URL;
 	
+	header_remove("Pragma");
+	header_remove("Cache-Control");
+	header_remove("Set-Cookie");
+	header_remove("Expires");
+	header_remove("X-Powered-By");
+	header_remove("Vary");
+	
+	
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
 	// TODO: we need to stop passing the repo name around as "repo.git", it needs to be just "repo"
@@ -146,7 +154,7 @@ function gwvpmini_gitBackendInterface()
 			echo fread($fh, 8192);
 		}
 	} else {
-		//echo "would ask $repo,$actual_repo_name for $repo/$newloc from $repo_base/$repo/$newloc, NE";
+		error_log("would ask $repo for $repo/$newloc from $repo_base/$repo/$newloc, NE");
 		gwvpmini_fourZeroFour();
 		return;
 	}

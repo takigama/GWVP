@@ -26,7 +26,7 @@ function gwvpmini_goWeb()
 	// this is important for our plugin structure later on - the key on the array serves an an ordering method
 	ksort($CALL_ME_FUNCTIONS);
 	foreach($CALL_ME_FUNCTIONS as $key => $val) {
-		error_log("checking callmefunction $key as $val");
+		//error_log("checking callmefunction $key as $val");
 		$callme = $val();
 		if($callme !== false) {
 			$callme();

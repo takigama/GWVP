@@ -7,7 +7,7 @@ $CALL_ME_FUNCTIONS["auth"] = "gwvpmini_AuthCallMe";
 function gwvpmini_AuthCallMe()
 {
 
-	error_log("in repoadmin callme");
+	//error_log("in repoadmin callme");
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
@@ -115,6 +115,7 @@ function gwvpmini_checkBasicAuthLogin()
 {
 	$user = false;
 	$pass = false;
+	
 	if(isset($_SERVER["PHP_AUTH_USER"])) {
 		$user = $_SERVER["PHP_AUTH_USER"];
 	} else return false;
@@ -122,7 +123,9 @@ function gwvpmini_checkBasicAuthLogin()
 	if(isset($_SERVER["PHP_AUTH_PW"])) {
 		$pass = $_SERVER["PHP_AUTH_PW"];
 	} else return false;
-
+	
+	error_log("IN CHECK FOR BASIC AUTH: $user");
+	
 	error_log("passing basic auth for $user, $pass to backend");
 	$auth = gwvpmini_authUserPass($user, $pass);
 	if($auth !== false) {

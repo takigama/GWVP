@@ -6,7 +6,7 @@ $DB_CONNECTION = false;
 
 
 global $db_url, $db_type;
-error_log("in include for database, $db_type, $db_name");
+//error_log("in include for database, $db_type, $db_name");
 
 
 function gwvpmini_DBExists()
@@ -14,15 +14,15 @@ function gwvpmini_DBExists()
 	global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name;
 	
 	// oh this isnt working. poo.
-	error_log("checking for $db_name, $db_type");
+	//error_log("checking for $db_name, $db_type");
 	
 	if($db_type == "sqlite") {
 		if(file_exists($db_name)) {
-			error_log("Exists");
+			//error_log("Exists");
 			return true;
 		}
 		else {
-			error_log("no exists");
+			//error_log("no exists");
 			return false;
 		}
 	}
@@ -118,29 +118,48 @@ function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
 	if($cperms_t === false) return false;
 	
 	$permsarray = array();
-	if($cperms_t == "") {
-		$permsarray[$uid] = $acc;
-	} else {
-		$permsarray = unserialize(base64_decode($cperms_t));
-		$permsarray[$uid] = $acc;
-		if($acc == 0) {
-			error_log("PERMSUPDATE: REMOVE $uid");
-			unset($permsarray[$uid]);
+	if($uid != "b") {
+		if($cperms_t == "") {
+			$permsarray[$uid] = $acc;
+		} else {
+			$permsarray = unserialize(base64_decode($cperms_t));
+			$permsarray[$uid] = $acc;
+			if($acc == 0) {
+				error_log("PERMSUPDATE: REMOVE $uid");
+				unset($permsarray[$uid]);
+			}
 		}
+	} else {
+		error_log("CHANGEREPOPERMS for b of $acc");
+		$permsarray["b"] = $acc;
 	}
 	
 	// check if base is now r or a, we can drop any 1's
 	if($permsarray["b"] == "a" || $permsarray["b"] == "r") {
 		foreach($permsarray as $key => $val) {
 			if($val == 1) {
+				error_log("CHANGEREPOPERMS removed $key $val for base perm change");
 				unset($permsarray[$key]);
 			}
 		}
 	}
 	
+	if(is_array($permsarray)) {
+		if(!isset($permsarray["b"])) {
+			// something went wrong, repalce b bit
+			$permsarray["b"] = "a";
+		}
+	} else {
+		// something went even wronger
+		$permsarray["b"] = "a";
+	}
+	
+
 	$encperms = base64_encode(serialize($permsarray));
 	
 	$sql = "update repos set repos_perms='$encperms' where repos_id='$rid'";
+
+	error_log("PERMSARRAYNOW $sql ".print_r($permsarray,true));
 	
 	$conn->query($sql);
 	
@@ -283,14 +302,14 @@ function gwvpmini_ConnectDB()
 	global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name, $DB_CONNECTION;
 
 	// first check if $DB_CONNECTION IS live
-	error_log("in connection $db_type, $db_name");
+	//error_log("in connection $db_type, $db_name");
 
 	if($DB_CONNECTION != false) return $DB_CONNECTION;
 
 	if($db_type == "sqlite") {
 		$db_url = $db_name;
 		if(!file_exists($db_name)) {
-			error_log("$db_name does not exist - problem");
+			//error_log("$db_name does not exist - problem");
 			// TODO: NEED A SETUP AGENT!
 			gwvpmini_dbCreateSQLiteStructure($db_name);
 			gwvpmini_setConfigVal("repodir", "$data_directory/repos");
@@ -298,7 +317,7 @@ function gwvpmini_ConnectDB()
 	}
 
 	// and here we go with pdo.
-	error_log("attmpting to open db, $db_type:$db_url");
+	//error_log("attmpting to open db, $db_type:$db_url");
 	try {
 		$DB_CONNECTION = new PDO("$db_type:$db_url");
 	} catch(PDOException $exep) {

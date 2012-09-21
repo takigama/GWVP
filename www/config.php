@@ -12,5 +12,5 @@ $db_username = "";
 $db_password = "";
 
 
-error_log("included config file");
+//error_log("included config file");
 ?>

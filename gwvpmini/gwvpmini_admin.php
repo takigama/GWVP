@@ -11,7 +11,7 @@ if(gwvpmini_isLoggedIn()) if(gwvpmini_isUserAdmin()) {
 function gwvpmini_AdminCallMe()
 {
 
-	error_log("in admin callme");
+	//error_log("in admin callme");
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);

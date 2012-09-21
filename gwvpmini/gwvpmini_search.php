@@ -49,8 +49,8 @@ function gwvpmini_SearchMainPageBody()
 	
 	$search = $_REQUEST["searchstring"];
 	
-	$reps = gwvp_findReposLike($search);
-	$ppls = gwvp_findPeopleLike($search);
+	$reps = gwvpmini_findReposLike($search);
+	$ppls = gwvpmini_findPeopleLike($search);
 	
 	
 	

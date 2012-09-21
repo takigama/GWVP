@@ -45,6 +45,9 @@ function gwvpmini_AdminCallMe()
 					if($qspl[1] == "switchenable") {
 						return "gwvpmini_SwitchEnableUser";
 					}
+					if($qspl[1] == "switchenablerepo") {
+						return "gwvpmini_SwitchEnableRepo";
+					}
 				} else {
 					error_log("i got here, where next?");
 					return "gwvpmini_AdminMainPage";
@@ -166,13 +169,24 @@ function gwvpmini_AdminMainPageBody()
 		$rn = $val["name"];
 		$ds = $val["desc"];
 		$ow = $val["owner"];
+		$st = $val["status"];
 		$udet = gwvpmini_getUser(null, null, $ow);
 		if(!$udet) {
 			$owl = "Orphaned";
 		} else {
 			$owl = $udet["username"]." (".$udet["id"].") - ".$udet["fullname"]." (".$udet["email"].") - <a href=\"mailto:".$udet["email"]."\">Email Owner</a>";
 		}
-		echo "<tr><td><a href=\"$BASE_URL/view/$rn\">$rn</a></td><td>$ds</td><td>$owl</td><td><a href=\"$BASE_URL/admin/removerepo/$id\">Remove</a> <a href=\"$BASE_URL/admin/switchenable/$id\">Disable</a></td></tr>";
+		
+		if($st == 1) {
+			$stat = 0;
+			$cstat = "Enable";
+		} else {
+			$stat = 1;
+			$cstat = "Disable";
+		}
+		
+		echo "<tr><td><a href=\"$BASE_URL/view/$rn\">$rn</a></td><td>$ds</td><td>$owl</td><td><a href=\"$BASE_URL/admin/removerepo/$id\">Remove</a> <a href=\"$BASE_URL/admin/switchenablerepo/$stat/$id\">$cstat</a></td></tr>";
+		
 	}
 	echo "</table>";
 }
@@ -424,5 +438,37 @@ function gwvpmini_SwitchEnableUser()
 	
 	header("Location: $BASE_URL/admin");
 	
+}
+
+function gwvpmini_SwitchEnableRepo()
+{
+	global $BASE_URL;
+	
+	$rid = -1;
+	$newst = -1;
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		if(isset($qspl[2])) {
+			$newst = $qspl[2];
+		}
+		if(isset($qspl[3])) {
+			$rid = $qspl[3];
+		}
+	}
+	
+	if($newst == 1) $stat = "disabled";
+	else $stat = "enabled";
+	
+	if($rid > 0 && ($newst == 1 || $newst == 0)) {
+		$details = gwvpmini_getRepo(null, null, $rid);
+		if($newst == 1) gwvpmini_DisableRepo($rid);
+		if($newst == 0) gwvpmini_EnableRepo($rid);
+		gwvpmini_SendMessage("info", "Repo $uname ($rid) has been $stat");
+	} else {
+		gwvpmini_SendMessage("info", "Problem disabling repo with rid $rid");
+	}
+	
+	header("Location: $BASE_URL/admin");
 }
 ?>

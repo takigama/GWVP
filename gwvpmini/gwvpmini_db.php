@@ -88,10 +88,103 @@ function gwvpmini_getRepo($ownerid=null, $name=null, $id=null)
 		$returns["name"] = $u_res["repos_name"];
 		$returns["desc"] = $u_res["repos_description"];
 		$returns["ownerid"] = $u_res["repos_owner"];
-		$returns["perms"] = $u_res["repos_readperms"];
+		$returns["status"] = $u_res["repos_status"];
 	}
 
 	return $returns;
+
+}
+
+// $rid = repo id
+// $uid = user id (a for "anyone", r for "registered")
+// $acc = 0 or 1, 0 = no access, 1 = read access, 2 = write
+// first part of ths is the "base" repo permissions
+// this is spec'd as b:t where t = a (anyone can read), r (only registered can read) or x (explicit read perms)
+function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "select repos_perms from repos where repos_id='$rid'";
+	
+	$res = $conn->query($sql);
+	
+	error_log("CHANGEREPOPERMS: call with $rid, $uid, $acc");
+	
+	$cperms_t = "";
+	foreach($res as $row) {
+		$cperms_t = $row[0];
+	}
+	
+	if($cperms_t === false) return false;
+	
+	$permsarray = array();
+	if($cperms_t == "") {
+		$permsarray[$uid] = $acc;
+	} else {
+		$permsarray = unserialize(base64_decode($cperms_t));
+		$permsarray[$uid] = $acc; 
+	}
+	
+	// check if base is now r or a, we can drop any 1's
+	if($permsarray["b"] == "a" || $permsarray["b"] == "r") {
+		foreach($permsarray as $key => $val) {
+			if($val == 1) {
+				unset($permsarray[$key]);
+			}
+		}
+	}
+	
+	$encperms = base64_encode(serialize($permsarray));
+	
+	$sql = "update repos set repos_perms='$encperms' where repos_id='$rid'";
+	
+	$conn->query($sql);
+	
+}
+
+//returns 0 for none, 1 for read, 2 for writes
+function gwvpmini_GetRepoPerm($rid, $uid)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$dets = gwvpmini_getRepo(null, null, $rid);
+	
+	$sql = "select repos_perms from repos where repos_id='$rid'";
+	
+	$res = $conn->query($sql);
+	
+	error_log("PERMCHECK: FUCK U! $sql");
+	
+	$cperms_t = false;
+	if($res !== false) foreach($res as $row) {
+		$cperms_t = $row[0];
+	}
+	
+	if($cperms_t === false) return 0;
+	
+	error_log("PERMSCHECK $rid, $uid:".print_r($dets, true));
+	
+	if($dets === false) return 0;
+	
+	if($dets["ownerid"] == $uid) return 2;
+	
+	$permsarray = unserialize(base64_decode($cperms_t));
+	
+	error_log("PERMSARRAY: ".print_r($permsarray,true));
+	
+	
+	$perm = 0;
+	if($uid != "a") {
+		if(isset($permsarray[$uid])) {
+			$perm = $permsarray[$uid];
+		} else if($permsarray["b"] == "a" ||$permsarray["b"] == "r") {
+			$perm = 1;
+		}
+	} else {
+		if($permsarray["b"] == "a") $perm = 1;
+	}
+	
+	return $perm;
 
 }
 
@@ -121,11 +214,11 @@ function gwvpmini_RemoveUser($uid)
 function gwvpmini_DisableUser($uid)
 {
 	$conn = gwvpmini_ConnectDB();
-	
+
 	if($uid < 0) return;
-	
+
 	$sql = "update users set user_status=1 where user_id='$uid'";
-	
+
 	return $conn->query($sql);
 }
 
@@ -137,6 +230,28 @@ function gwvpmini_EnableUser($uid)
 
 	$sql = "update users set user_status=0 where user_id='$uid'";
 
+	return $conn->query($sql);
+}
+
+function gwvpmini_DisableRepo($rid)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	if($rid < 0) return;
+	
+	$sql = "update repos set repos_status=1 where repos_id='$rid'";
+	
+	return $conn->query($sql);
+}
+
+function gwvpmini_EnableRepo($rid)
+{
+	$conn = gwvpmini_ConnectDB();
+
+	if($rid < 0) return;
+	
+	$sql = "update repos set repos_status=0 where repos_id='$rid'";
+	
 	return $conn->query($sql);
 }
 
@@ -247,7 +362,8 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	"repos_name" TEXT,
 	"repos_description" TEXT,
 	"repos_owner" INTEGER,
-	"repos_readperms" TEXT,
+	"repos_perms" TEXT,
+	"repos_status" TEXT,
 	UNIQUE(repos_name)
 	)';
 
@@ -342,7 +458,7 @@ function gwvpmini_GetRepoId($reponame)
 	$retval = -1;
 	if(!$res) return -1;
 	foreach($res as $row) {
-		$reval = (int)$row[0];
+		$retval = (int)$row[0];
 	}
 	
 	return $retval;
@@ -447,13 +563,17 @@ function gwvpmini_setConfigVal($confname, $confval)
 	return $conn->query($sql);
 }
 
-function gwvpmini_AddRepo($name, $desc, $ownerid, $perms = "perms-public")
+function gwvpmini_AddRepo($name, $desc, $ownerid)
 {
 	
 	error_log("addrepo in db for $name, $desc, $ownerid");
 	$conn = gwvpmini_ConnectDB();
 	
-	$sql = "insert into repos values (null, '$name', '$desc', '$ownerid', '$perms')";
+	$perms["b"] = "a";
+	
+	$encperms = base64_encode(serialize($perms));
+	
+	$sql = "insert into repos values (null, '$name', '$desc', '$ownerid', '$encperms', 0)";
 	
 	$conn->query($sql);
 }
@@ -579,7 +699,7 @@ function gwvpmini_GetUsers($startat = 0, $num = 10)
 	return $retval;
 }
 
-function gwvp_findPeopleLike($search)
+function gwvpmini_findPeopleLike($search)
 {
 	$conn = gwvpmini_ConnectDB();
 	
@@ -635,6 +755,7 @@ function gwvpmini_GetRepos($startat=0, $num=200)
 		$retval[$id]["desc"] = $row["repos_description"];
 		$retval[$id]["owner"] = $row["repos_owner"];
 		$retval[$id]["id"] = $row["repos_id"];
+		$retval[$id]["status"] = $row["repos_status"];		
 	}
 	
 	return $retval;
@@ -642,7 +763,7 @@ function gwvpmini_GetRepos($startat=0, $num=200)
 	
 }
 
-function gwvp_findReposLike($search)
+function gwvpmini_findReposLike($search)
 {
 	$conn = gwvpmini_ConnectDB();
 	
@@ -669,6 +790,7 @@ function gwvp_findReposLike($search)
 		$retval[$id]["desc"] = $row["repos_description"];
 		$retval[$id]["owner"] = $row["repos_owner"];
 		$retval[$id]["id"] = $row["repos_id"];
+		$retval[$id]["status"] = $row["repos_status"];
 	}
 	
 	return $retval;

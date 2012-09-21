@@ -66,10 +66,17 @@ function gwvpmini_RepoMainPageBody()
 				$desc = $repo["desc"];
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
-				$repo_base = gwvpmini_getConfigVal("repodir");
-				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2>&1";
 				error_log("CMD: $cmd");
-				system("$cmd");
+				//system("$cmd");
+				$fls = popen($cmd, "r");
+				$tks = "";
+				if($fls !== false) while(!feof($fls)) {
+					$tks .= fread($fls,1024);
+				}
+				
+				if($tks == "") {
+					echo "No Log Info Yet";
+				} else echo $tks;
 				echo "</td>";
 				echo "</tr>";
 			}
@@ -109,9 +116,18 @@ function gwvpmini_GitLogProvider()
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
 				$repo_base = gwvpmini_getConfigVal("repodir");
-				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2>&1";
+				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2> /dev/null";
 				error_log("CMD: $cmd");
-				system("$cmd");
+				//system("$cmd");
+				$fls = popen($cmd, "r");
+				$tks = "";
+				if($fls !== false) while(!feof($fls)) {
+					$tks .= fread($fls,1024);
+				}
+				
+				if($tks == "") {
+					echo "No Log Info Yet";
+				} else echo $tks;
 				echo "</td>";
 				echo "</tr>";
 			}

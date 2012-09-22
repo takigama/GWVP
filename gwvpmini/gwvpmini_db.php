@@ -425,6 +425,14 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	// where authed = any authenticated user, anon = everyone (logged in, not logged in, etc)
 	// read|visible|write = can clone from repo|can see repo exists and see description but not clone from it|can push to repo
 	// TODO: is this sufficient? i have to think about it
+	
+	$activitysql = '
+	CREATE TABLE "activity" (
+		"activity_type" TEXT,
+		"activity_date" TEXT,
+		"activity_desc" TEXT,
+		"activity_viewby" TEXT
+	)';
 
 	$configsql = '
 	CREATE TABLE "config" (
@@ -444,6 +452,7 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	$DB_CONNECTION->query($initialuser_user);
 	$DB_CONNECTION->query($reposql);
 	$DB_CONNECTION->query($configsql);
+	$DB_CONNECTION->query($activitysql);
 }
 
 function gwvpmini_getConfigVal($confname)

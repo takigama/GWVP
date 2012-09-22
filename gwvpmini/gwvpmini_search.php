@@ -84,7 +84,7 @@ function gwvpmini_SearchMainPageBody()
 			$userdets = get_gravatar($ownerinfo["email"], 40, 'mm', 'g', true);
 			$userdets .= "<br><a href=\"$BASE_URL/user/".$ownerinfo["username"]."\">".$ownerinfo["username"]."</a>";
 			
-			$repodets = "<b>".$rep["name"]."</b><br>".$rep["desc"];
+			$repodets = "<b><a href=\"$BASE_URL/view/".$rep["name"]."\">".$rep["name"]."</a></b><br>".$rep["desc"];
 			echo "<tr><td>$userdets</td><td>$repodets</td></tr>";
 		}
 		echo "</table>";

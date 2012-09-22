@@ -62,6 +62,9 @@ function gwvpmini_RepoViewPageBody()
 	
 	$repo_base = gwvpmini_getConfigVal("repodir");
 
+	$bperms_f = gwvpmini_GetRepoPerms(gwvpmini_GetRepoId($repo_view_call));
+	$bperms = $bperms_f["b"];
+	
 	$owner_view = false;
 	
 	if($_SERVER["SERVER_PORT"] == 443) $proto="https://";
@@ -73,16 +76,30 @@ function gwvpmini_RepoViewPageBody()
 	
 	$owner_name = $owner["username"];
 	
-	
+	// TODO: fix this so that if user has no read access to repo, they cant see it
 	if(isset($_SESSION["id"])) {
 		if($owner["id"] == $_SESSION["id"]) {
 			$owner_view = true;
+		} else if ($bperms != "r") {
+			// check user level perms
+			$perm = gwvpmini_GetRepoPerm($rid, $_SESSION["id"]);
+			if($perm < 1) {
+				header("Location: $BASE_URL");
+				return;
+			}
+		}
+	} else {
+		if($bperms != "a") {
+			header("Location: $BASE_URL");
+			return;
 		}
 	}
 	
 	
 	error_log("STUFF:".print_r($owner,true));
-	$cloneurl = "git clone $proto$sname$BASE_URL/git/$repo_view_call.git";
+	if($bperms != "a") $login = $_SESSION["username"]."@password:";
+	else $login = "";
+	$cloneurl = "git clone $proto$login$sname$BASE_URL/git/$repo_view_call.git";
 	echo "<textarea rows=1 cols=".strlen($cloneurl).">$cloneurl</textarea><br>";
 	
 	if($owner_view) $owner_extra = " (YOU)";
@@ -92,9 +109,9 @@ function gwvpmini_RepoViewPageBody()
 	echo "<b>$desc</b><br>";
 	
 	if($owner_view) {
-		$bperms_f = gwvpmini_GetRepoPerms(gwvpmini_GetRepoId($repo_view_call));
 		
-		$bperms = $bperms_f["b"];
+		
+
 		
 		$anyo = "";
 		$regd = "";

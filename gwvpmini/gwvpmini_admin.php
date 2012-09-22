@@ -7,6 +7,18 @@ if(gwvpmini_isLoggedIn()) if(gwvpmini_isUserAdmin()) {
 }
 
 
+$reg = gwvpmini_getConfigVal("gravatarenabled");
+
+$use_gravatar = false;
+if($reg == null) {
+	gwvpmini_setConfigVal("gravatarenabled", "1");
+} else if($reg == 1) {
+	$use_gravatar = true;
+} else {
+	$use_gravatar = false;
+}
+
+global $use_gravatar;
 
 function gwvpmini_AdminCallMe()
 {
@@ -48,6 +60,9 @@ function gwvpmini_AdminCallMe()
 					if($qspl[1] == "switchenablerepo") {
 						return "gwvpmini_SwitchEnableRepo";
 					}
+					if($qspl[1] == "changegravs") {
+						return "gwvpmini_SwitchGravatars";
+					}
 				} else {
 					error_log("i got here, where next?");
 					return "gwvpmini_AdminMainPage";
@@ -81,7 +96,7 @@ function gwvpmini_AdminMainPage()
 function gwvpmini_AdminMainPageBody()
 {
 	global $BASE_URL;
-	global $can_register, $reg_reqs_confirm, $confirm_from_address;
+	global $can_register, $reg_reqs_confirm, $confirm_from_address, $use_gravatar;
 	
 	if($can_register) {
 		$register = "Registration Enabled (<a href=\"$BASE_URL/admin/changereg\">Disable</a>)";
@@ -94,10 +109,17 @@ function gwvpmini_AdminMainPageBody()
 	} else {
 		$regconfirm = "Registration Doesnt Require Confirmation (<a href=\"$BASE_URL/admin/changeconfirm\">Enable</a>)";
 	}
+	
+	if($use_gravatar) {
+		$usegrav = "Gravatars are enabled (<a href=\"$BASE_URL/admin/changegravs\">Disable</a>)";
+	} else {
+		$usegrav = "Gravatars are disabled (<a href=\"$BASE_URL/admin/changegravs\">Enable</a>)";
+	}
+	
 	$totalusers = gwvpmini_GetNUsers();
 	echo "<table><tr valign=\"top\"><td>";
 	echo "<h2>Users - $totalusers</h2>";
-	echo "$register<br>$regconfirm<br>";
+	echo "$register<br>$regconfirm<br>$usegrav<br>";
 	echo "<form method=\"post\" action=\"$BASE_URL/admin/changefromemail\">";
 	echo "Address emails are sent from <input type=\"text\" name=\"fromemail\" value=\"$confirm_from_address\"><input type=\"submit\" name=\"Update\" value=\"Update\"><br>";
 	echo "</form>";	
@@ -468,6 +490,24 @@ function gwvpmini_SwitchEnableRepo()
 	} else {
 		gwvpmini_SendMessage("info", "Problem disabling repo with rid $rid");
 	}
+	
+	header("Location: $BASE_URL/admin");
+}
+
+function gwvpmini_SwitchGravatars()
+{
+	global $BASE_URL, $use_gravatar;
+	
+	if($newst == 1) $stat = "disabled";
+	else $stat = "enabled";
+	
+	if($use_gravatar) {
+		gwvpmini_setConfigVal("gravatarenabled", "0");
+	} else {
+		gwvpmini_setConfigVal("gravatarenabled", "1");
+	}
+	
+	gwvpmini_SendMessage("info", "Gravatars $stat");
 	
 	header("Location: $BASE_URL/admin");
 }

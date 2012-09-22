@@ -76,13 +76,12 @@ function gwvpmini_SearchMainPageBody()
 	echo "<tr valign=\"top\"><td>";
 	
 	
-	// get_gravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $atts = array() ) {
+	
 	if($reps != false) {
 		echo "<table border=\"1\">";
 		foreach($reps as $rep) {
 			$ownerinfo = gwvpmini_getUser(null, null, $rep["owner"]);
-			$userdets = get_gravatar($ownerinfo["email"], 40, 'mm', 'g', true);
-			$userdets .= "<br><a href=\"$BASE_URL/user/".$ownerinfo["username"]."\">".$ownerinfo["username"]."</a>";
+			$userdets = gwvpmini_HtmlGravatar($ownerinfo["email"], 40, "<br>")."<a href=\"$BASE_URL/user/".$ownerinfo["username"]."\">".$ownerinfo["username"]."</a>";
 			
 			$repodets = "<b><a href=\"$BASE_URL/view/".$rep["name"]."\">".$rep["name"]."</a></b><br>".$rep["desc"];
 			echo "<tr><td>$userdets</td><td>$repodets</td></tr>";
@@ -97,8 +96,7 @@ function gwvpmini_SearchMainPageBody()
 		echo "<table border=\"1\">";
 		$ownedrepos = "BLAHBLAH";
 		foreach($ppls as $ppl) {
-			$userdets = get_gravatar($ppl["email"], 40, 'mm', 'g', true);
-			$userdets .= "<br><a href=\"$BASE_URL/user/".$ppl["username"]."\">".$ppl["username"]."</a>";
+			$userdets = gwvpmini_HtmlGravatar($ppl["email"], 40, "<br>")."<a href=\"$BASE_URL/user/".$ppl["username"]."\">".$ppl["username"]."</a>";
 			$repos = gwvpmini_GetOwnedRepos($ppl["username"]);
 			if($repos == false) $ownedrepos = "No Repos";
 			else {

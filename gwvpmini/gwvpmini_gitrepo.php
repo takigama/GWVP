@@ -110,7 +110,7 @@ function gwvpmini_RepoMainPageBody()
 				
 				$owner = gwvpmini_getUser(null, null, $repo["owner"]);
 				$repname = "<a href=\"$BASE_URL/view/$name\">$name</a>";
-				$repown = get_gravatar($owner["email"], 30, 'mm', 'g', true)."<br><a href=\"$BASE_URL/user/".$owner["username"]."\">".$owner["username"]."</a>";
+				$repown = gwvpmini_HtmlGravatar($owner["email"], 30, "<br>")."<a href=\"$BASE_URL/user/".$owner["username"]."\">".$owner["username"]."</a>";
 				
 				
 				echo "<tr><td>$repname</td><td>$repown</td><td>$desc</td><td>$lastlog</td></tr>";

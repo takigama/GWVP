@@ -111,7 +111,7 @@ function gwvpmini_RepoViewPageBody()
 	if($owner_view) $owner_extra = " (YOU)";
 	else $owner_extra = "";
 	
-	echo "<h2>".get_gravatar($owner["email"], 30, 'mm', 'g', true)."$repo_view_call - $owner_name$owner_extra</h2>";
+	echo "<h2>".gwvpmini_HtmlGravatar($owner["email"], 30)."$repo_view_call - $owner_name$owner_extra</h2>";
 	if(!$owner_view) echo "<b>$desc</b><br>";
 	
 	if($owner_view) {
@@ -150,7 +150,7 @@ function gwvpmini_RepoViewPageBody()
 			foreach($bperms_f as $key=>$val) {
 				if($val == 1) {
 					$dets = gwvpmini_getUser(null, null, $key);
-					echo get_gravatar($dets["email"], 18, 'mm', 'g', true)." <input type=\"checkbox\" name=\"$key\"> ".$dets["username"]."<br>";
+					echo gwvpmini_HtmlGravatar($dets["email"], 18, " ")."<input type=\"checkbox\" name=\"$key\"> ".$dets["username"]."<br>";
 					$nl = 1;
 				}
 			}
@@ -167,7 +167,7 @@ function gwvpmini_RepoViewPageBody()
 		foreach($bperms_f as $key=>$val) {
 			if($val == 2) {
 				$dets = gwvpmini_getUser(null, null, $key);
-				echo get_gravatar($dets["email"], 18, 'mm', 'g', true)." <input type=\"checkbox\" name=\"$key\"> ".$dets["username"]."<br>";
+				echo gwvpmini_HtmlGravatar($dets["email"], 18, " ")."<input type=\"checkbox\" name=\"$key\"> ".$dets["username"]."<br>";
 				$nl = 1;
 			}
 		}
@@ -215,7 +215,7 @@ function gwvpmini_RepoViewPageBody()
 					$flon = "$flin3 (external)";
 				}
 			}
-			echo "<tr><td>".get_gravatar($flin2, 18, 'mm', 'g', true)."$flon</td><td>$flin1</td><td>$flin4</td></tr>";
+			echo "<tr><td>".gwvpmini_HtmlGravatar($flin2, 18)."$flon</td><td>$flin1</td><td>$flin4</td></tr>";
 		}
 		echo "</table>";
 	} else {

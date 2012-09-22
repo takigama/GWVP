@@ -265,6 +265,16 @@ function gwvpmini_fourZeroFour()
  * @return String containing either just a URL or a complete image tag
  * @source http://gravatar.com/site/implement/images/php/
  */
+function gwvpmini_HtmlGravatar($email, $size, $htmlappend="")
+{
+	
+	global $use_gravatar;
+	
+	
+	if($use_gravatar == false) return "";
+	return get_gravatar( $email, $size, 'mm', 'g', true)."$htmlappend";
+}
+
 function get_gravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $atts = array() ) {
 	$url = 'http://en.gravatar.com/avatar/';
 	$url .= md5( strtolower( trim( $email ) ) );

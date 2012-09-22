@@ -426,11 +426,20 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	// read|visible|write = can clone from repo|can see repo exists and see description but not clone from it|can push to repo
 	// TODO: is this sufficient? i have to think about it
 	
+	
+	// type for now will only be "git"
+	// date is obvious
+	// desc is a desction of the activity
+	// link is of the form "repo,reponame,repoid:user,username,useremail,userid" so it
+	// can be attached simply
+	// viewby is a simple list of uid's that should be able to see it... "r" for all registered
+	// "a" for everyone
 	$activitysql = '
 	CREATE TABLE "activity" (
 		"activity_type" TEXT,
 		"activity_date" TEXT,
 		"activity_desc" TEXT,
+		"activity_link" TEXT,
 		"activity_viewby" TEXT
 	)';
 

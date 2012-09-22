@@ -266,12 +266,17 @@ function gwvpmini_callGitBackend($username, $repo)
 			error_log("cant set pipe1 non-blocking");
 		}
 		
+		
+		$fp = fopen("/tmp/gitup.".rand(0,4000000), "w");
 		// i was going to use stream_select, but i feel this works better like this
 		while($continue) {
 			// do client
 			if(!feof($fh)) {
 				$from_client_data = fread($fh,8192);
-				if($from_client_data !== false) fwrite($pipes[0], $from_client_data);
+				if($from_client_data !== false) {
+					fwrite($pipes[0], $from_client_data);
+					fwrite($fp, $from_client_data);
+				}
 				fflush($pipes[0]);
 				//fwrite($fl, $from_client_data);
 				$client_len = strlen($from_client_data);

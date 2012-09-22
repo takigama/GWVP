@@ -36,6 +36,9 @@ function gwvpmini_RepoViewCallMe()
 			if($qspl[0] == "reporemovecontribs") {
 				return "gwvpmini_RemoveRepoContributor";
 			}
+			if($qspl[0] == "repoupdatedesc") {
+				return "gwvpmini_RepoUpdateDescription";
+			}
 			return false;
 		}
 		else return false;
@@ -73,6 +76,8 @@ function gwvpmini_RepoViewPageBody()
 	
 	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
 	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
+	$editdesc = preg_replace("/\<br\>/", "\n", $desc);
+	
 	
 	$owner_name = $owner["username"];
 	
@@ -97,7 +102,7 @@ function gwvpmini_RepoViewPageBody()
 	
 	
 	error_log("STUFF:".print_r($owner,true));
-	if($bperms != "a") $login = $_SESSION["username"]."@password:";
+	if($bperms != "a") $login = $_SESSION["username"].":password@";
 	else $login = "";
 	$cloneurl = "git clone $proto$login$sname$BASE_URL/git/$repo_view_call.git";
 	echo "<textarea rows=1 cols=".strlen($cloneurl).">$cloneurl</textarea><br>";
@@ -106,9 +111,12 @@ function gwvpmini_RepoViewPageBody()
 	else $owner_extra = "";
 	
 	echo "<h2>".get_gravatar($owner["email"], 30, 'mm', 'g', true)."$repo_view_call - $owner_name$owner_extra</h2>";
-	echo "<b>$desc</b><br>";
+	if(!$owner_view) echo "<b>$desc</b><br>";
 	
 	if($owner_view) {
+		echo "<form method=\"post\" action=\"$BASE_URL/repoupdatedesc/$repo_view_call\">";
+		echo "<h3>Description<h3><textarea name=\"desc\" cols=\"120\" rows=\"5\">$editdesc</textarea><br><input type=\"submit\" name=\"Update\" value=\"Update\">";
+		echo "</form><br>";
 		
 		
 
@@ -169,6 +177,7 @@ function gwvpmini_RepoViewPageBody()
 		echo "<input type=\"text\" name=\"contribusername\"> <input type=\"submit\" name=\"Add\" value=\"Add\">";
 		echo "</form><br>";
 		echo "</td></tr></table>";
+		
 	}
 	//echo "command: git log --git-dir=$repo_base/$repo_view_call.git --pretty=format:\"%H\" -10";
 	$rs = popen("git --git-dir=$repo_base/$repo_view_call.git log --pretty=format:\"%H\" -10", "r");
@@ -491,6 +500,52 @@ function gwvpmini_RemoveRepoReader()
 	header("Location: $BASE_URL/view/$repo_view_call");
 	return;
 
+}
+
+function gwvpmini_RepoUpdateDescription()
+{
+	global $BASE_URL, $repo_view_call;
+	
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		error_log("PLOOP:qview".print_r($qspl, true));
+	}
+	
+	if(isset($qspl[1])) $repo_view_call = $qspl[1];
+	else {
+		error_log("PLOOP: no repo name");
+		// TODO: btw, this makes no sense
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	
+	$owner = gwvpmini_GetRepoOwnerDetailsFromName($repo_view_call);
+	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
+	
+	$owner_name = $owner["username"];
+	
+	$owner_view = false;
+	if(isset($_SESSION["id"])) {
+		if($owner["id"] == $_SESSION["id"]) {
+			$owner_view = true;
+		}
+	}
+	if(!$owner_view) {
+		gwvpmini_SendMessage("error", "failure updating description for repo");
+		error_log("PLOOP: attempt to update from non-owner");
+		header("Location: $BASE_URL/view/$repo_view_call");
+		return;
+	}
+	
+	$rid = gwvpmini_GetRepoId($repo_view_call);
+	
+	gwvpmini_UpdateRepoDescription($rid, $_REQUEST["desc"]);
+		
+	gwvpmini_SendMessage("info", "Repo description updated");
+	header("Location: $BASE_URL/view/$repo_view_call");
+	return;
 }
 
 ?>

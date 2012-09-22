@@ -263,6 +263,19 @@ function gwvpmini_DisableUser($uid)
 	return $conn->query($sql);
 }
 
+function gwvpmini_UpdateRepoDescription($rid, $desc)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	// remove any tag elements
+	$newdesc_r = preg_replace("/[\<\>\;]+/", "", $desc);
+	$newdesc = preg_replace("/\n/", "<br>", $newdesc_r);
+	
+	$sql = "update repos set repos_description='$newdesc' where repos_id='$rid'";
+	
+	return $conn->query($sql);
+}
+
 function gwvpmini_EnableUser($uid)
 {
 	$conn = gwvpmini_ConnectDB();

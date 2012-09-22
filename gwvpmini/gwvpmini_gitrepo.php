@@ -54,7 +54,6 @@ function gwvpmini_RepoMainPageBody()
 	global $BASE_URL;
 	
 	if(gwvpmini_isLoggedIn()) {
-		gwvpmini_GitCreateRepoForm();
 		$repos = gwvpmini_GetOwnedRepos($_SESSION["username"]);
 		if(!$repos) {
 			echo "You currently own no repos<br>";	
@@ -64,6 +63,8 @@ function gwvpmini_RepoMainPageBody()
 			foreach($repos as $repo) {
 				$name = $repo["name"];
 				$desc = $repo["desc"];
+				$repo_base = gwvpmini_getConfigVal("repodir");
+				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2> /dev/null";
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
 				error_log("CMD: $cmd");
@@ -79,6 +80,40 @@ function gwvpmini_RepoMainPageBody()
 				} else echo $tks;
 				echo "</td>";
 				echo "</tr>";
+			}
+			echo "</table>";
+		}
+		gwvpmini_GitCreateRepoForm();
+		
+		
+		$contreps = gwvpmini_GetContributedRepos($_SESSION["username"]);
+		
+		if($contreps !== false) {
+			echo "<h2>Repos you contribute to</h2>";
+			echo "<table border=\"1\"><tr><th>Repo Name</th><th>Owner</th><th>Repo Description</th><th>Last Log</th></tr>";
+			foreach($contreps as $repo) {
+				$name = $repo["name"];
+				$desc = $repo["desc"];
+				$repo_base = gwvpmini_getConfigVal("repodir");
+				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2> /dev/null";
+				error_log("CMD: $cmd");
+				//system("$cmd");
+				$fls = popen($cmd, "r");
+				$tks = "";
+				if($fls !== false) while(!feof($fls)) {
+					$tks .= fread($fls,1024);
+				}
+				
+				if($tks == "") {
+					$lastlog = "No Log Info Yet";
+				} else $lastlog = $tks;
+				
+				$owner = gwvpmini_getUser(null, null, $repo["owner"]);
+				$repname = "<a href=\"$BASE_URL/view/$name\">$name</a>";
+				$repown = get_gravatar($owner["email"], 30, 'mm', 'g', true)."<br><a href=\"$BASE_URL/user/".$owner["username"]."\">".$owner["username"]."</a>";
+				
+				
+				echo "<tr><td>$repname</td><td>$repown</td><td>$desc</td><td>$lastlog</td></tr>";
 			}
 			echo "</table>";
 		}

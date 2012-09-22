@@ -138,8 +138,11 @@ function gwvpmini_gitBackendInterface()
 	// if its a write, we push for authentication
 	
 	//if($write) {
-		gwvpmini_callGitBackend($person, $repo);
-		return;
+	if(!$person) {
+		$person = "anonymous";
+	}
+	gwvpmini_callGitBackend($person, $repo);
+	return;
 	//}
 
 	// if we made it this far, we a read and we have permissions to do so, just search the file from the repo

@@ -78,6 +78,7 @@ function gwvpmini_RepoViewPageBody()
 	$desc = gwvpmini_GetRepoDescFromName($repo_view_call);
 	$editdesc = preg_replace("/\<br\>/", "\n", $desc);
 	
+	$rid = gwvpmini_GetRepoId($repo_view_call);
 	
 	$owner_name = $owner["username"];
 	

@@ -717,7 +717,7 @@ function gwvpmini_GetContributedRepos($username)
 
 
 	$uid = gwvpmini_GetUserId($username);
-	$sql = "select repos_id,repos_description,repos_perms,repos_owernid,repos_status from repos";
+	$sql = "select repos_id,repos_description,repos_perms,repos_owner,repos_status,repos_name from repos";
 	$res = $conn->query($sql);
 	if($username == "") return false;
 
@@ -726,16 +726,24 @@ function gwvpmini_GetContributedRepos($username)
 	$i = 0;
 	foreach($res as $row) {
 		$perms = unserialize(base64_decode($row["repos_perms"]));
+		error_log("CONTRIB: $uid for ".$row["repos_id"]." - ".print_r($perms,true));
 		if(isset($perms["$uid"])) if($perms["$uid"] > 1) {
 			$rids[$i]["id"] = $row["repos_id"];
 			$rids[$i]["desc"] = $row["repos_description"];
-			$rids[$i]["ownerid"] = $row["repos_ownerid"];
+			$rids[$i]["owner"] = $row["repos_owner"];
 			$rids[$i]["status"] = $row["repos_status"];
+			$rids[$i]["name"] = $row["repos_name"];
 			$i++;
 		}
 	}
+	$retval = $rids;
+	
+	if($i == 0) {
+		error_log("CONTRIBREPOS: no repos found?");
+		return false;
+	}
 
-	error_log(print_r($retval, true));
+	error_log("CONTRIBREPOS: ".print_r($retval, true));
 	return $retval;
 }
 

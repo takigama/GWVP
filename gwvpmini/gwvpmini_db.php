@@ -667,6 +667,7 @@ function gwvpmini_GetUserNameFromEmail($email)
 
 	return $retval;
 }
+
 function gwvpmini_GetOwnedRepos($username)
 {
 	/*
@@ -693,9 +694,47 @@ function gwvpmini_GetOwnedRepos($username)
 		$retval[$id]["name"] = $row["repos_name"];
 		$retval[$id]["desc"] = $row["repos_description"];
 		$retval[$id]["id"] = $row["repos_id"];
+		$retval[$id]["status"] = $row["repos_status"];
 		error_log(print_r($row, true));
 	}
 	
+	error_log(print_r($retval, true));
+	return $retval;
+}
+
+function gwvpmini_GetContributedRepos($username)
+{
+	/*
+	 * 	CREATE TABLE "repos" (
+	 		"repos_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	 		"repos_name" TEXT,
+	 		"repos_description" TEXT,
+	 		"repos_owner" INTEGER
+	 )';
+
+	*/
+	$conn = gwvpmini_ConnectDB();
+
+
+	$uid = gwvpmini_GetUserId($username);
+	$sql = "select repos_id,repos_description,repos_perms,repos_owernid,repos_status from repos";
+	$res = $conn->query($sql);
+	if($username == "") return false;
+
+	$retval = false;
+	$rids = null;
+	$i = 0;
+	foreach($res as $row) {
+		$perms = unserialize(base64_decode($row["repos_perms"]));
+		if(isset($perms["$uid"])) if($perms["$uid"] > 1) {
+			$rids[$i]["id"] = $row["repos_id"];
+			$rids[$i]["desc"] = $row["repos_description"];
+			$rids[$i]["ownerid"] = $row["repos_ownerid"];
+			$rids[$i]["status"] = $row["repos_status"];
+			$i++;
+		}
+	}
+
 	error_log(print_r($retval, true));
 	return $retval;
 }

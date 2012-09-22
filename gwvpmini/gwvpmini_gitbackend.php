@@ -89,9 +89,6 @@ function gwvpmini_gitBackendInterface()
 			$write = true;
 		}
 	}
-	if($_SERVER["REQUEST_METHOD"] == "POST") {
-		$write = true;
-	}
 	
 	//$write = true;
 	// THIS MAY CAUSE ISSUES LATER ON but we do it cause the git client ignores our 403 when it uses git-receive-pack after an auth
@@ -139,13 +136,14 @@ function gwvpmini_gitBackendInterface()
 	}
 	
 	// if its a write, we push for authentication
-	if($write) {
+	
+	//if($write) {
 		gwvpmini_callGitBackend($person, $repo);
 		return;
-	}
+	//}
 
 	// if we made it this far, we a read and we have permissions to do so, just search the file from the repo
-	if(file_exists("$repo_base/$repo.git/$newloc")) {
+	/*if(file_exists("$repo_base/$repo.git/$newloc")) {
 		error_log("would ask $repo for $repo.git/$newloc from $repo_base/$repo.git/$newloc");
 		$fh = fopen("$repo_base/$repo.git/$newloc", "rb");
 		
@@ -157,7 +155,7 @@ function gwvpmini_gitBackendInterface()
 		error_log("would ask $repo for $repo/$newloc from $repo_base/$repo/$newloc, NE");
 		gwvpmini_fourZeroFour();
 		return;
-	}
+	}*/
 	
 }
 

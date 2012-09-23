@@ -26,6 +26,16 @@ function gwvpmini_gitControlCallMe()
 }
 
 
+function gwvpmini_CreateUpdateHookInRepo($repopath)
+{
+	$fp = fopen("$repopath/hooks/$repopath", "w");
+	
+	if(!$fp) error_log("could not create update hook");
+	
+	// TODO: think about this one
+	
+}
+
 function gwvpmini_gitBackendInterface()
 {
 	// and this is where i re-code the git backend interface from scratch
@@ -82,6 +92,8 @@ function gwvpmini_gitBackendInterface()
 	
 	// so now we have the repo
 	// next we determine if this is a read or a write
+	
+	// TODO: WE NEED TO FIX THIS, IT DOESNT ALWAYS DETECT a "WRITE"
 	$write = false;
 	if(isset($_REQUEST["service"])) {
 		if($_REQUEST["service"] == "git-receive-pack") {
@@ -141,7 +153,15 @@ function gwvpmini_gitBackendInterface()
 	if(!$person) {
 		$person = "anonymous";
 	}
+	
+	// if its a write, we check (before and after) the branch/tag info to see if they were updated
+	//if($write) {
+	//}
+	
 	gwvpmini_callGitBackend($person, $repo);
+	
+	//if($write) {
+		//}
 	return;
 	//}
 
@@ -199,8 +219,7 @@ function gwvpmini_callGitBackend($username, $repo)
 		}
 		
 		//sleep(2);
-		
-		
+
 		
 		// this is where the fun, it ends.
 		$myoutput = "";

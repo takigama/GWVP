@@ -112,7 +112,7 @@ function gwvpmini_RepoViewPageBody()
 	else $owner_extra = "";
 	
 	echo "<h2>".gwvpmini_HtmlGravatar($owner["email"], 30)."$repo_view_call - $owner_name$owner_extra</h2>";
-	if(!$owner_view) echo "<b>$desc</b><br>";
+	if(!$owner_view) echo "$desc<br>";
 	
 	if($owner_view) {
 		echo "<form method=\"post\" action=\"$BASE_URL/repoupdatedesc/$repo_view_call\">";

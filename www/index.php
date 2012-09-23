@@ -5,7 +5,7 @@ $BASE_URL = dirname($_SERVER["PHP_SELF"]);
 
 global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name, $db_username, $db_password, $IS_WEB_REQUEST;
 
-$IS_WEB_REQUEST = false;
+$IS_WEB_REQUEST = true;
 
 if(file_exists("./config.php")) require_once("./config.php");
 else if(file_exists("/etc/gwvpmini/config.php")) require_once("/etc/gwvpmini/config.php");

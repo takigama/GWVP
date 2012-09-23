@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+if($IS_WEB_REQUEST) session_start();
 
 $CALL_ME_FUNCTIONS["auth"] = "gwvpmini_AuthCallMe";
 

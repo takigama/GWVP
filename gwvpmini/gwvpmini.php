@@ -11,7 +11,11 @@ require_once("gwvpmini_view.php");
 require_once("gwvpmini_activity.php");
 require_once("gwvpmini_register.php");
 require_once("gwvpmini_user.php");
-if(gwvpmini_isLoggedIn()) if(gwvpmini_isUserAdmin()) {
+if($IS_WEB_REQUEST) {
+	if(gwvpmini_isLoggedIn()) if(gwvpmini_isUserAdmin()) {
+		require_once("gwvpmini_admin.php");
+	}
+} else {
 	require_once("gwvpmini_admin.php");
 }
 

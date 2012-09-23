@@ -1,35 +1,37 @@
 <?php
-$CALL_ME_FUNCTIONS["register"] = "gwvpmini_RegisterCallMe";
 
-global $can_register, $reg_reqs_confirm, $confirm_from_address;
-
-$reg = gwvpmini_getConfigVal("canregister");
-$reg2 = gwvpmini_getConfigVal("registerrequiresconfirm");
-$reg3 = gwvpmini_getConfigVal("eamilfromaddress");
-
-if($reg == null) {
-	gwvpmini_setConfigVal("canregister", "1");
-} else if($reg == 1) {
-	$can_register = true;
-} else {
-	$can_register = false;
-}
-
-if($reg2 == null) {
-	gwvpmini_setConfigVal("registerrequiresconfirm", "0");
-} else if($reg2 == 1) {
-	$reg_reqs_confirm = true;
-} else {
-	$reg_reqs_confirm = false;
-}
-
-if($reg3 == null) {
-	gwvpmini_setConfigVal("eamilfromaddress", "admin@localhost");
-	$confirm_from_address = "admin@localhost";
-} else {
-	$confirm_from_address = $reg3;
-}
-
+if($IS_WEB_REQUEST) {
+	$CALL_ME_FUNCTIONS["register"] = "gwvpmini_RegisterCallMe";
+	
+	global $can_register, $reg_reqs_confirm, $confirm_from_address;
+	
+	$reg = gwvpmini_getConfigVal("canregister");
+	$reg2 = gwvpmini_getConfigVal("registerrequiresconfirm");
+	$reg3 = gwvpmini_getConfigVal("eamilfromaddress");
+	
+	if($reg == null) {
+		gwvpmini_setConfigVal("canregister", "1");
+	} else if($reg == 1) {
+		$can_register = true;
+	} else {
+		$can_register = false;
+	}
+	
+	if($reg2 == null) {
+		gwvpmini_setConfigVal("registerrequiresconfirm", "0");
+	} else if($reg2 == 1) {
+		$reg_reqs_confirm = true;
+	} else {
+		$reg_reqs_confirm = false;
+	}
+	
+	if($reg3 == null) {
+		gwvpmini_setConfigVal("eamilfromaddress", "admin@localhost");
+		$confirm_from_address = "admin@localhost";
+	} else {
+		$confirm_from_address = $reg3;
+	}
+}	
 
 function gwvpmini_RegisterCallMe()
 {

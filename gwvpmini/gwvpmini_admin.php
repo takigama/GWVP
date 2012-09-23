@@ -1,24 +1,27 @@
 <?php
 
-if(gwvpmini_isLoggedIn()) if(gwvpmini_isUserAdmin()) {
-	$MENU_ITEMS["20repos"]["text"] = "Administration";
-	$MENU_ITEMS["20repos"]["link"] = "$BASE_URL/admin";
-	$CALL_ME_FUNCTIONS["admin"] = "gwvpmini_AdminCallMe";
-}
 
-
-$reg = gwvpmini_getConfigVal("gravatarenabled");
-
-$use_gravatar = false;
-if($reg == null) {
-	gwvpmini_setConfigVal("gravatarenabled", "1");
-} else if($reg == 1) {
-	$use_gravatar = true;
-} else {
+if($IS_WEB_REQUEST) {
+	if(gwvpmini_isLoggedIn()) if(gwvpmini_isUserAdmin()) {
+		$MENU_ITEMS["20repos"]["text"] = "Administration";
+		$MENU_ITEMS["20repos"]["link"] = "$BASE_URL/admin";
+		$CALL_ME_FUNCTIONS["admin"] = "gwvpmini_AdminCallMe";
+	}
+	
+	
+	$reg = gwvpmini_getConfigVal("gravatarenabled");
+	
 	$use_gravatar = false;
+	if($reg == null) {
+		gwvpmini_setConfigVal("gravatarenabled", "1");
+	} else if($reg == 1) {
+		$use_gravatar = true;
+	} else {
+		$use_gravatar = false;
+	}
+	
+	global $use_gravatar;
 }
-
-global $use_gravatar;
 
 function gwvpmini_AdminCallMe()
 {

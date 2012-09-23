@@ -11,6 +11,7 @@ $db_name = "$data_directory/gwvpmini.db"; // just a file for sqlite, for anythin
 $db_username = "";
 $db_password = "";
 
+$cmd_line_tool = realpath("../bin/gwvpminicmdtool.php");
 
 //error_log("included config file");
 ?>

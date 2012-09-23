@@ -26,20 +26,42 @@ function gwvpmini_gitControlCallMe()
 }
 
 
-function gwvpmini_CreateUpdateHookInRepo($repopath)
+function gwvpmini_CreateRepoHooks($repopath, $cmdpath)
 {
-	$fp = fopen("$repopath/hooks/$repopath", "w");
+	$fp = fopen("$repopath/hooks/pre-receive", "w");
+	
+	if(!$fp) error_log("could not create pre-receive hook");
+	
+	// TODO: think about this one
+	$script = '#!/bin/bash'."\n\n".'DCOMMIT=`cat`'."\n".'START=`echo $DCOMMIT|cut -d " " -f 1`'."\n".'END=`echo $DCOMMIT|cut -d " " -f 2`'."\n".'REF=`echo $DCOMMIT|cut -d " " -f 3`'."\n\n";
+	$script .= "php $cmdpath pre-receive ";
+	$script .= '$START $END $REF'."\n\n";
+	fwrite($fp, $script);
+	
+	fclose($fp);
+	
+	chmod("$repopath/hooks/pre-receive", 0755);
+
+
+	$fp = fopen("$repopath/hooks/update", "w");
 	
 	if(!$fp) error_log("could not create update hook");
 	
 	// TODO: think about this one
+	$script = "#!/bin/bash\n\n";
+	$script .= "php $cmdpath update ";
+	$script .= '$1 $2 $3'."\n\n";
+	fwrite($fp, $script);
 	
+	fclose($fp);
+	
+	chmod("$repopath/hooks/update", 0755);
 }
 
 function gwvpmini_gitBackendInterface()
 {
 	// and this is where i re-code the git backend interface from scratch
-	global $BASE_URL;
+	global $BASE_URL, $cmd_line_tool;
 	
 	header_remove("Pragma");
 	header_remove("Cache-Control");
@@ -88,6 +110,11 @@ function gwvpmini_gitBackendInterface()
 	// we do an update server cause its weird and i cant figure out when it actually needs to happen
 	chdir("$repo_base/$repo.git");
 	exec("/usr/bin/git update-server-info");
+	
+	if(!file_exists("$repo_base/$repo.git/hooks/pre-receive") || !file_exists("$repo_base/$repo.git/hooks/update")) {
+		error_log("WRITING HOOKS");
+		gwvpmini_CreateRepoHooks("$repo_base/$repo.git", $cmd_line_tool);
+	}
 	
 	
 	// so now we have the repo
@@ -219,7 +246,8 @@ function gwvpmini_callGitBackend($username, $repo)
 		}
 		
 		//sleep(2);
-
+		
+		$userdets = gwvpmini_getUser($username);
 		
 		// this is where the fun, it ends.
 		$myoutput = "";
@@ -232,12 +260,16 @@ function gwvpmini_callGitBackend($username, $repo)
 		$procenv["GATEWAY_INTERFACE"] = "CGI/1.1";
 		$procenv["PATH_TRANSLATED"] = "/$repo_base/$repo.git/$euri";
 		$procenv["REQUEST_METHOD"] = "$rmeth";
+		$procenv["GIT_COMMITTER_NAME"] = $userdets["fullname"];
+		$procenv["GIT_COMMITTER_EMAIL"] = $userdets["email"];
 		$procenv["GIT_HTTP_EXPORT_ALL"] = "1";
 		$procenv["QUERY_STRING"] = "$qs";
 		$procenv["HTTP_USER_AGENT"] = "git/1.7.1";
 		$procenv["REMOTE_USER"] = "$username";
 		$procenv["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"];
 		$procenv["AUTH_TYPE"] = "Basic";
+		
+		error_log("PROCENV: ".print_r($procenv,true));
 		
 		if(isset($_SERVER["CONTENT_TYPE"])) { 
 			$procenv["CONTENT_TYPE"] = $_SERVER["CONTENT_TYPE"];

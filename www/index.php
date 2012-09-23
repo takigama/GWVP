@@ -3,7 +3,7 @@ error_log("INCALLSTART ".print_r($_COOKIE, true)." -------------------- ".print_
 $WEB_ROOT_FS = realpath(dirname(__FILE__));
 $BASE_URL = dirname($_SERVER["PHP_SELF"]);
 
-global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name, $db_username, $db_password, $IS_WEB_REQUEST;
+global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name, $db_username, $db_password, $IS_WEB_REQUEST, $cmd_line_tool;
 
 $IS_WEB_REQUEST = true;
 
@@ -19,6 +19,8 @@ if(isset($noconfig)) {
 	gwvpmini_goSetup();
 	return;
 }
+
+error_log("CMDLINETOOL: ".$cmd_line_tool);
 
 // need to make this db agnostic
 if(!gwvpmini_DBExists($db_name)) {

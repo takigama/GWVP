@@ -64,7 +64,7 @@ function gwvpmini_RepoMainPageBody()
 				$name = $repo["name"];
 				$desc = $repo["desc"];
 				$repo_base = gwvpmini_getConfigVal("repodir");
-				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2> /dev/null";
+				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
 				error_log("CMD: $cmd");
@@ -95,7 +95,7 @@ function gwvpmini_RepoMainPageBody()
 				$name = $repo["name"];
 				$desc = $repo["desc"];
 				$repo_base = gwvpmini_getConfigVal("repodir");
-				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2> /dev/null";
+				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
 				error_log("CMD: $cmd");
 				//system("$cmd");
 				$fls = popen($cmd, "r");
@@ -151,7 +151,7 @@ function gwvpmini_GitLogProvider()
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
 				$repo_base = gwvpmini_getConfigVal("repodir");
-				$cmd = "git --git-dir=\"$repo_base/$name.git\" log -1 2> /dev/null";
+				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
 				error_log("CMD: $cmd");
 				//system("$cmd");
 				$fls = popen($cmd, "r");

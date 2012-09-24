@@ -61,10 +61,17 @@ function gwvpmini_UserViewPageBody()
 	
 	
 	$dets = gwvpmini_getUser($user_view_call);
-	error_log("show view of user with $user_view_call: ". print_r($dets, true));
+	//error_log("show view of user with $user_view_call: ". print_r($dets, true));
 
 	echo "<h2>".$dets["fullname"]."</h2><br>";
 	echo gwvpmini_HtmlGravatar($dets["email"],80);
+	
+	$isme = false;
+	if(isset($_SESSION["id"])) {
+		if($_SESSION["id"] == $dets["id"]) {
+			echo "This is your page";
+		}
+	}
 }
 
 ?>

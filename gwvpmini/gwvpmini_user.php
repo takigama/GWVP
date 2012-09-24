@@ -57,7 +57,7 @@ function gwvpmini_UserViewPage()
 
 function gwvpmini_UserViewPageBody()
 {
-	global $user_view_call;
+	global $user_view_call, $BASE_URL;
 	
 	
 	$dets = gwvpmini_getUser($user_view_call);
@@ -65,12 +65,30 @@ function gwvpmini_UserViewPageBody()
 
 	echo "<h2>".$dets["fullname"]."</h2><br>";
 	echo gwvpmini_HtmlGravatar($dets["email"],80);
+	echo "<br>";
 	
 	$isme = false;
 	if(isset($_SESSION["id"])) {
 		if($_SESSION["id"] == $dets["id"]) {
-			echo "This is your page";
+			$isme = true;
 		}
+	}
+	
+	if($isme) {
+		echo "<form method=\"post\" action=\"$BASE_URL/user/updateuserdesc\">";
+		echo "Your Description<br><textarea name=\"desc\" cols=\"100\" rows=\"4\">".$dets["desc"]."</textarea><br>";
+		echo "<input type=\"submit\" name=\"Update\" value=\"Update\">";
+		echo "</form>";
+		
+		echo "<h3>New Password</h3>";
+		echo "<form method=\"post\" action=\"$BASE_URL/user/updateuserpassword\">";
+		echo "<table><tr><td>Old Password</td><td><input type=\"password\" name=\"oldpassword\"></td></tr>";
+		echo "<tr><td>New Password</td><td><input type=\"password\" name=\"newpassword1\"></td></tr>";
+		echo "<tr><td>Confirm New Password</td><td><input type=\"password\" name=\"newpassword2\"></td></tr></table>";
+		echo "<input type=\"submit\" name=\"Update\" value=\"Update\">";
+		echo "</form>";
+	} else {
+		echo $dets["desc"]."<br>";
 	}
 }
 

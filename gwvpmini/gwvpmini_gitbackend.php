@@ -269,7 +269,7 @@ function gwvpmini_callGitBackend($username, $repo)
 		$procenv["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"];
 		$procenv["AUTH_TYPE"] = "Basic";
 		
-		error_log("PROCENV: ".print_r($procenv,true));
+		//error_log("PROCENV: ".print_r($procenv,true));
 		
 		if(isset($_SERVER["CONTENT_TYPE"])) { 
 			$procenv["CONTENT_TYPE"] = $_SERVER["CONTENT_TYPE"];

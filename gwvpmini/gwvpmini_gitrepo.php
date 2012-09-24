@@ -169,6 +169,15 @@ function gwvpmini_GitLogProvider()
 			echo "</table>";
 		}
 	}
+	
+	$logs = gwvpmini_GetActivityLog();
+	if($logs !== null) {
+		echo "<h2>Global Log</h2><table>";
+		foreach($logs as $ents) {
+			echo "<tr><td>".$ents["type"]."</td><td>".$ents["commitid"]."</td></tr>";
+		}
+		echo "</table>";
+	}
 }
 
 function gwvpmini_GitCreateRepoForm()

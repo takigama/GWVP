@@ -270,6 +270,11 @@ function gwvpmini_HtmlGravatar($email, $size, $htmlappend="")
 	
 	global $use_gravatar;
 	
+	if($use_gravatar) {
+		error_log("call to gravatar with yes");
+	} else {
+		error_log("call to gravatar with no");
+	}
 	
 	if($use_gravatar == false) return "";
 	return get_gravatar( $email, $size, 'mm', 'g', true)."$htmlappend";

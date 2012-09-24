@@ -316,6 +316,7 @@ function gwvpmini_ConnectDB()
 
 	// first check if $DB_CONNECTION IS live
 	//error_log("in connection $db_type, $db_name");
+	$db_url = false;
 
 	if($DB_CONNECTION != false) return $DB_CONNECTION;
 
@@ -330,7 +331,7 @@ function gwvpmini_ConnectDB()
 	}
 
 	// and here we go with pdo.
-	//error_log("attmpting to open db, $db_type:$db_url");
+	error_log("attmpting to open db, $db_type:$db_url");
 	try {
 		$DB_CONNECTION = new PDO("$db_type:$db_url");
 	} catch(PDOException $exep) {
@@ -386,6 +387,59 @@ function gwvpmini_AddUser($username, $password, $fullname, $email, $desc, $level
 	return $retval;
 }
 
+function gwvpmini_GetActivityLog($nentries = 100)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "select * from activity order by activity_date desc limit 100";
+
+	$res = $conn->query($sql);
+	
+	$logs = null;
+	$i = 0;
+	foreach($res as $row) {
+		$logs[$i]["type"] = $row["activity_type"];
+		$logs[$i]["date"] = $row["activity_date"];
+		$logs[$i]["userid"] = $row["activity_user"];
+		$logs[$i]["repoid"] = $row["activity_repo"];
+		$logs[$i]["commitid"] = $row["activity_commitid"];
+		$logs[$i]["commitlog"] = $row["activity_commitlog"];
+		$logs[$i]["visibleto"] = $row["activity_visibleto"];
+		$i++;
+	}
+	
+	return $logs;
+}
+
+function gwvpmini_AddActivityLog($type, $userid, $repoid, $commitid, $commitlog)
+{
+	/*
+	 * 	CREATE TABLE "activity" (
+		"activity_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+		"activity_type" TEXT,
+		"activity_date" TEXT,
+		"activity_user" TEXT,
+		"activity_repo" TEXT,
+		"activity_commitid" TEXT,
+		"activity_commitlog" TEXT,
+		"activity_visibleto" TEXT
+	)';
+
+	 */
+	
+	$conn = gwvpmini_ConnectDB();
+	
+	// TODO: implement visibility
+	$visibleto = "a";
+	
+	$sql = "insert into 'activity' values ( null, '$type', '".time()."', '$userid', '$repoid', '$commitid', '$commitlog', '$visibleto')";
+	
+	error_log("SQL IS $sql");
+	
+	$res = $conn->query($sql);
+	if(!$res) return -1;
+	return true;
+}
 
 function gwvpmini_dbCreateSQLiteStructure($dbloc)
 {
@@ -436,11 +490,14 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	// "a" for everyone
 	$activitysql = '
 	CREATE TABLE "activity" (
+		"activity_id" INTEGER PRIMARY KEY AUTOINCREMENT,
 		"activity_type" TEXT,
 		"activity_date" TEXT,
-		"activity_desc" TEXT,
-		"activity_link" TEXT,
-		"activity_viewby" TEXT
+		"activity_user" TEXT,
+		"activity_repo" TEXT,
+		"activity_commitid" TEXT,
+		"activity_commitlog" TEXT,
+		"activity_visibleto" TEXT
 	)';
 
 	$configsql = '

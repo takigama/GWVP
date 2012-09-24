@@ -9,18 +9,6 @@ if($IS_WEB_REQUEST) {
 	}
 	
 	
-	$reg = gwvpmini_getConfigVal("gravatarenabled");
-	
-	$use_gravatar = false;
-	if($reg == null) {
-		gwvpmini_setConfigVal("gravatarenabled", "1");
-	} else if($reg == 1) {
-		$use_gravatar = true;
-	} else {
-		$use_gravatar = false;
-	}
-	
-	global $use_gravatar;
 }
 
 function gwvpmini_AdminCallMe()

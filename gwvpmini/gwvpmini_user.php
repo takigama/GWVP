@@ -1,6 +1,20 @@
 <?php
 $CALL_ME_FUNCTIONS["userview"] = "gwvpmini_UserViewCallMe";
 
+if($IS_WEB_REQUEST) {
+	$reg = gwvpmini_getConfigVal("gravatarenabled");
+	
+	$use_gravatar = false;
+	if($reg == null) {
+		gwvpmini_setConfigVal("gravatarenabled", "1");
+	} else if($reg == 1) {
+		$use_gravatar = true;
+	} else {
+		$use_gravatar = false;
+	}
+	
+	global $use_gravatar;
+}
 
 
 function gwvpmini_UserViewCallMe()
@@ -45,7 +59,12 @@ function gwvpmini_UserViewPageBody()
 {
 	global $user_view_call;
 	
-	echo "Want to see $user_view_call eh?";
+	
+	$dets = gwvpmini_getUser($user_view_call);
+	error_log("show view of user with $user_view_call: ". print_r($dets, true));
+
+	echo "<h2>".$dets["fullname"]."</h2><br>";
+	echo gwvpmini_HtmlGravatar($dets["email"],80);
 }
 
 ?>

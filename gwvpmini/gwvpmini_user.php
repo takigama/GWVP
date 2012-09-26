@@ -6,7 +6,8 @@ if($IS_WEB_REQUEST) {
 	
 	$use_gravatar = false;
 	if($reg == null) {
-		gwvpmini_setConfigVal("gravatarenabled", "1");
+		// disable grav's by default
+		gwvpmini_setConfigVal("gravatarenabled", "0");
 	} else if($reg == 1) {
 		$use_gravatar = true;
 	} else {
@@ -74,7 +75,7 @@ function gwvpmini_UserViewPageBody()
 		}
 	}
 	
-	if($isme) {
+	if($isme || gwvpmini_isUserAdmin()) {
 		echo "<form method=\"post\" action=\"$BASE_URL/user/updateuserdesc\">";
 		echo "Your Description<br><textarea name=\"desc\" cols=\"100\" rows=\"4\">".$dets["desc"]."</textarea><br>";
 		echo "<input type=\"submit\" name=\"Update\" value=\"Update\">";
@@ -82,9 +83,17 @@ function gwvpmini_UserViewPageBody()
 		
 		echo "<h3>New Password</h3>";
 		echo "<form method=\"post\" action=\"$BASE_URL/user/updateuserpassword\">";
-		echo "<table><tr><td>Old Password</td><td><input type=\"password\" name=\"oldpassword\"></td></tr>";
+		echo "<table>";
+		if($isme) echo "<tr><td>Old Password</td><td><input type=\"password\" name=\"oldpassword\"></td></tr>";
 		echo "<tr><td>New Password</td><td><input type=\"password\" name=\"newpassword1\"></td></tr>";
 		echo "<tr><td>Confirm New Password</td><td><input type=\"password\" name=\"newpassword2\"></td></tr></table>";
+		echo "<input type=\"submit\" name=\"Update\" value=\"Update\">";
+		echo "</form>";
+		
+		echo "<h3>New Email Address</h3>";
+		echo "<form method=\"post\" action=\"$BASE_URL/user/updateuseremail\">";
+		echo "<table><tr><td>New Email Address</td><td><input type=\"password\" name=\"newemail1\"></td></tr>";
+		echo "<tr><td>Confirm New Email Address</td><td><input type=\"password\" name=\"newemail2\"></td></tr></table>";
 		echo "<input type=\"submit\" name=\"Update\" value=\"Update\">";
 		echo "</form>";
 	} else {

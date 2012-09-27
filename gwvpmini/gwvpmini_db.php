@@ -252,6 +252,39 @@ function gwvpmini_RemoveUser($uid)
 	return $conn->query($sql);
 }
 
+function gwvpmini_UpdateUserEmail($uid, $email)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	if($uid < 0) return;
+	
+	$sql = "update users set user_email='$email' where user_id='$uid'";
+	
+	return $conn->query($sql);
+}
+
+function gwvpmini_UpdateUserDesc($uid, $desc)
+{
+	$conn = gwvpmini_ConnectDB();
+
+	if($uid < 0) return;
+
+	$sql = "update users set user_desc='$desc' where user_id='$uid'";
+
+	return $conn->query($sql);
+}
+
+function gwvpmini_UpdateUserPassword($uid, $pass)
+{
+	$conn = gwvpmini_ConnectDB();
+
+	if($uid < 0) return;
+
+	$sql = "update users set user_password='".sha1($pass)."' where user_id='$uid'";
+
+	return $conn->query($sql);
+}
+
 function gwvpmini_DisableUser($uid)
 {
 	$conn = gwvpmini_ConnectDB();

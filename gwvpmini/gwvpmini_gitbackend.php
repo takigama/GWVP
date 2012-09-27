@@ -318,6 +318,7 @@ function gwvpmini_callGitBackend($username, $repo)
 		}
 		
 		
+		$stlimit = 0;
 		$fp = fopen("/tmp/gitup.".rand(0,4000000), "w");
 		// i was going to use stream_select, but i feel this works better like this
 		while($continue) {
@@ -334,6 +335,7 @@ function gwvpmini_callGitBackend($username, $repo)
 			} else {
 				error_log("client end");
 				$client_len = 0;
+				//$continue = false;
 			}
 			
 			// do cgi
@@ -376,7 +378,10 @@ function gwvpmini_callGitBackend($username, $repo)
 				if($client_len == 0 && $cgi_len == 0) {
 					usleep(200000);
 					error_log("sleep tick");
+					$stlimit++;
+					if($stlimit > 2) $continue = false;
 				} else {
+					$stlimit = 0;
 					error_log("sizes: $client_len, $cgi_len");
 					if($cgi_len > 0) {
 						error_log("from cgi: \"$from_cgi_data\"");

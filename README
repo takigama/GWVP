@@ -1,15 +1,60 @@
-GWVP - Mini Version
-===================
+GWVP
+====
 
 ALPHA
 
-Original I started GWVP as quite a large php project, then I got stalled with some 
-problems and ultimately never really continued with it because I really needed to
-start from scratch. However it was providing a service I ultimately wanted for
-myself - an entirely web-based git reposity solution. So now i've started it again
-and this time i've got a new set of code starting from a smaller beginning that 
-will then expand over time as I work on it.
+GWVP stands for "git over web via php". It was written for one purpose of
+being a quick and simple way of getting a git repo online using only usernames
+and passwords rather then having to deal with ssh keys.
 
-The current version "works", but its ugly as sin.
+Installation
+============
 
-There is no install info at this point, but it will be coming soon.
+Ubuntu
+You'll need to add following packages:
+
+```
+sudo apt-get install php5-sqlite git apache2 php5-cli
+```
+
+Assuming you clone the repository into /opt/gwvp you will then need to make
+some changes to the rewrite, apache and gwvp configuration (assuming /gwvp
+for the url also)
+
+#### Apache config
+
+This goes in /etc/apache2/conf.d/gwvp.conf
+```
+Alias /gwvp /opt/gwvp/www
+
+<Directory /opt/gwvp/www>
+	DirectoryIndex index.php
+	AllowOverride All
+</Directory>
+```
+
+#### Rewrite
+
+Edit the file /opt/gwvp/www/.htaccess and change the top line to match your
+base url
+
+```
+RewriteBase /gwvp
+...
+```
+
+
+#### GWVP Config
+
+in /opt/gwvp/www/config.php data directory is (by default) /opt/gwvp/data
+This directory must be read/write by the apache user. The following will
+give the apache user write access to the file system:
+
+```
+mkdir -p /opt/gwvp/data
+sudo chown www-data:www-data /opt/gwvp/data
+```
+
+Done - now you should browse to http://yourmachine/gwvp and login as admin
+or user with a password of "password". Hopefully the rest is fairly straight
+forward and self-explanitory, but there will be a help system coming soon(tm)

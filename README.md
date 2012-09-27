@@ -3,9 +3,14 @@ GWVP
 
 ALPHA
 
-GWVP stands for "git over web via php". It was written for one purpose of
-being a quick and simple way of getting a git repo online using only usernames
-and passwords rather then having to deal with ssh keys.
+GWVP stands for "git over web via php". It was written entirely for myself and
+its intention was to have a simple way of managing some git repos that can be
+pulled and pushed to without the overhead of dealing with ssh keys. It also 
+allows the owner to give permissions to a repo such that you can control who
+reads and writes to it. All access to a repo is via http/https using usernames
+and passwords.
+
+Currently the code-base is a bit messy but that will improve over time.
 
 Installation
 ============

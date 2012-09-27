@@ -57,6 +57,9 @@ function gwvpmini_AdminCallMe()
 					if($qspl[1] == "changessl") {
 						return "gwvpmini_SwitchForceSSL";
 					}
+					if($qspl[1] == "switchadmin") {
+						return "gwvpmini_SwitchAdmin";
+					}
 				} else {
 					error_log("i got here, where next?");
 					return "gwvpmini_AdminMainPage";
@@ -119,8 +122,8 @@ function gwvpmini_AdminMainPageBody()
 	
 	$totalusers = gwvpmini_GetNUsers();
 	echo "<table><tr valign=\"top\"><td>";
-	echo "<h2>Users - $totalusers</h2>";
 	echo "$register<br>$regconfirm<br>$usegrav<br>$forcessl<br>";
+	echo "<h2>Users - $totalusers</h2>";
 	echo "<form method=\"post\" action=\"$BASE_URL/admin/changefromemail\">";
 	echo "Address emails are sent from <input type=\"text\" name=\"fromemail\" value=\"$confirm_from_address\"><input type=\"submit\" name=\"Update\" value=\"Update\"><br>";
 	echo "</form>";	
@@ -139,12 +142,12 @@ function gwvpmini_AdminMainPageBody()
 		$astat = "0";
 		$cstat = "WTF";
 		$level = "WTF";
-		if($st_l == 0) $level = "User";
-		if($st_l == 1) $level = "Admin";
+		if($st_l == 0) $level = "<a href=\"$BASE_URL/admin/switchadmin/1/$id\">User</a>";
+		if($st_l == 1) $level = "<a href=\"$BASE_URL/admin/switchadmin/0/$id\">Admin</a>";
 		
 		$status = "";
 		if($st_t[0] == "1") {
-			$status = ", disabled";
+			$status = ", Disabled";
 			$astat = 0;
 			$cstat = "Enable";
 		} else if ($st_t[0] == "0") {
@@ -159,9 +162,14 @@ function gwvpmini_AdminMainPageBody()
 		$st = "$level$status";
 		
 		$unlval = "<a href=\"$BASE_URL/user/$un\">$un</a>";
-		echo "<tr><td>$unlval</td><td>$em</td><td>$fn</td><td>$ds</td><td>$st</td><td><a href=\"$BASE_URL/admin/removeuser/$id\">Remove</a> ";
-		if ($st_t[0] == "0"||$st_t[0] == "1") echo "<a href=\"$BASE_URL/admin/switchenable/$astat/$id\">$cstat</a></td></tr>";
-		else echo "</td></tr>";
+		echo "<tr><td>$unlval</td><td>$em</td><td>$fn</td><td>$ds</td><td>$st</td>";
+		if($id != $_SESSION["id"]) {
+			echo "<td><a href=\"$BASE_URL/admin/removeuser/$id\">Remove</a> ";
+			if ($st_t[0] == "0"||$st_t[0] == "1") echo "<a href=\"$BASE_URL/admin/switchenable/$astat/$id\">$cstat</a></td></tr>";
+			else echo "</td></tr>";
+		} else {
+			echo "<td> -- </td></tr>";
+		}
 	}
 	
 	
@@ -461,6 +469,37 @@ function gwvpmini_SwitchEnableUser()
 	
 	header("Location: $BASE_URL/admin");
 	
+}
+
+function gwvpmini_SwitchAdmin()
+{
+	global $BASE_URL;
+	
+	$uid = -1;
+	$newst = -1;
+	if(isset($_REQUEST["q"])) {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		if(isset($qspl[2])) {
+			$newst = $qspl[2];
+		}
+		if(isset($qspl[3])) {
+			$uid = $qspl[3];
+		}
+	}
+	
+
+	if($uid > 0 && $newst >= 0) {
+		gwvpmini_SetUserStatusAdmin($uid, $newst);
+		if($newst == 0) {
+			gwvpmini_SendMessage("info", "User is no longer an admin");
+		} else {
+			gwvpmini_SendMessage("info", "User is now an admin");
+		}
+	} else gwvpmini_SendMessage("error", "Invalid user id");
+	
+	
+	header("Location: $BASE_URL/admin");
 }
 
 function gwvpmini_SwitchEnableRepo()

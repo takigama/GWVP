@@ -274,6 +274,17 @@ function gwvpmini_UpdateUserDesc($uid, $desc)
 	return $conn->query($sql);
 }
 
+function gwvpmini_SetUserStatusAdmin($uid, $adminstat)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	if($uid < 0) return;
+	
+	$sql = "update users set user_level='$adminstat' where user_id='$uid'";
+	
+	return $conn->query($sql);
+}
+
 function gwvpmini_UpdateUserPassword($uid, $pass)
 {
 	$conn = gwvpmini_ConnectDB();

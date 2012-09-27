@@ -13,7 +13,7 @@ $MENU_ITEMS["00home"]["link"] = "$BASE_URL";
 
 function gwvpmini_goWeb()
 {
-	global $CALL_ME_FUNCTIONS;
+	global $CALL_ME_FUNCTIONS, $force_ssl;
 	
 	// first we determine if we have a valid setup and run the installer if not
 	/*if(!gwvpmini_issetup()) {
@@ -24,6 +24,15 @@ function gwvpmini_goWeb()
 	// next, we go thru the CALL_ME_FUNCTIONS - the purpose of call_me_functions is to determine if a function should be called based on
 	// the functions return (i.e. if function returns false, its not it, otherwise it returns a function name we have to call)
 	// this is important for our plugin structure later on - the key on the array serves an an ordering method
+	
+	if($force_ssl) {
+		if(!isset($_SERVER['HTTPS'])) {
+			header("Location: https://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], true);
+			return;
+		}	
+	}
+	
+	
 	ksort($CALL_ME_FUNCTIONS);
 	foreach($CALL_ME_FUNCTIONS as $key => $val) {
 		//error_log("checking callmefunction $key as $val");

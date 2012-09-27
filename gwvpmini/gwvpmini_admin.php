@@ -54,6 +54,9 @@ function gwvpmini_AdminCallMe()
 					if($qspl[1] == "changegravs") {
 						return "gwvpmini_SwitchGravatars";
 					}
+					if($qspl[1] == "changessl") {
+						return "gwvpmini_SwitchForceSSL";
+					}
 				} else {
 					error_log("i got here, where next?");
 					return "gwvpmini_AdminMainPage";
@@ -87,7 +90,7 @@ function gwvpmini_AdminMainPage()
 function gwvpmini_AdminMainPageBody()
 {
 	global $BASE_URL;
-	global $can_register, $reg_reqs_confirm, $confirm_from_address, $use_gravatar;
+	global $can_register, $reg_reqs_confirm, $confirm_from_address, $use_gravatar, $force_ssl;
 	
 	if($can_register) {
 		$register = "Registration Enabled (<a href=\"$BASE_URL/admin/changereg\">Disable</a>)";
@@ -107,10 +110,17 @@ function gwvpmini_AdminMainPageBody()
 		$usegrav = "Gravatars are disabled (<a href=\"$BASE_URL/admin/changegravs\">Enable</a>)";
 	}
 	
+	if($force_ssl) {
+		$forcessl = "Force SSL is enabled (<a href=\"$BASE_URL/admin/changessl\">Disable</a>)";
+	} else {
+		$forcessl = "Force SSL is disabled (<a href=\"$BASE_URL/admin/changessl\">Enable</a>)";
+	}
+	
+	
 	$totalusers = gwvpmini_GetNUsers();
 	echo "<table><tr valign=\"top\"><td>";
 	echo "<h2>Users - $totalusers</h2>";
-	echo "$register<br>$regconfirm<br>$usegrav<br>";
+	echo "$register<br>$regconfirm<br>$usegrav<br>$forcessl<br>";
 	echo "<form method=\"post\" action=\"$BASE_URL/admin/changefromemail\">";
 	echo "Address emails are sent from <input type=\"text\" name=\"fromemail\" value=\"$confirm_from_address\"><input type=\"submit\" name=\"Update\" value=\"Update\"><br>";
 	echo "</form>";	
@@ -501,5 +511,24 @@ function gwvpmini_SwitchGravatars()
 	gwvpmini_SendMessage("info", "Gravatars $stat");
 	
 	header("Location: $BASE_URL/admin");
+}
+
+function gwvpmini_SwitchForceSSL()
+{
+	global $BASE_URL, $force_ssl;
+	
+	if($newst == 1) $stat = "disabled";
+	else $stat = "enabled";
+	
+	if($force_ssl) {
+		gwvpmini_setConfigVal("forcessl", "0");
+	} else {
+		gwvpmini_setConfigVal("forcessl", "1");
+	}
+	
+	gwvpmini_SendMessage("info", "forcessl $stat");
+	
+	header("Location: $BASE_URL/admin");
+	
 }
 ?>

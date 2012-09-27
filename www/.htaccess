@@ -1,5 +1,5 @@
 RewriteEngine on
-RewriteBase /src/local/eclipse-workspace/gwvp-mini/www/ 
+RewriteBase /gwvp 
 RewriteRule ^index\.php.* - [L,B]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

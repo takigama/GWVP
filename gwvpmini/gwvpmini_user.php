@@ -15,6 +15,21 @@ if($IS_WEB_REQUEST) {
 	}
 	
 	global $use_gravatar;
+	
+	$reg = gwvpmini_getConfigVal("forcessl");
+
+	$force_ssl = false;
+	if($reg == null) {
+		// dont force ssl by default
+		gwvpmini_setConfigVal("forcessl", "0");
+	} else if($reg == 1) {
+		$force_ssl = true;
+	} else {
+		$force_ssl = false;
+	}
+
+	global $force_ssl;
+	
 }
 
 

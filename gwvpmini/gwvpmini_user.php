@@ -37,7 +37,7 @@ function gwvpmini_UserViewCallMe()
 {
 	global $user_view_call;
 	
-	error_log("in admin callme");
+	// error_log("in admin callme");
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
@@ -89,7 +89,7 @@ function gwvpmini_UserViewPageBody()
 	
 	
 	$dets = gwvpmini_getUser($user_view_call);
-	//error_log("show view of user with $user_view_call: ". print_r($dets, true));
+	//// error_log("show view of user with $user_view_call: ". print_r($dets, true));
 
 	echo "<h2>".$dets["fullname"]."</h2><br>";
 	echo gwvpmini_HtmlGravatar($dets["email"],80);

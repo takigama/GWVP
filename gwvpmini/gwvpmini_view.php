@@ -10,7 +10,7 @@ function gwvpmini_RepoViewCallMe()
 {
 	global $repo_view_call;
 	
-	error_log("in admin callme");
+	// error_log("in admin callme");
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
@@ -102,7 +102,7 @@ function gwvpmini_RepoViewPageBody()
 	}
 	
 	
-	error_log("STUFF:".print_r($owner,true));
+	// error_log("STUFF:".print_r($owner,true));
 	if($bperms != "a") $login = $_SESSION["username"].":password@";
 	else $login = "";
 	$cloneurl = "git clone $proto$login$sname$BASE_URL/git/$repo_view_call.git";
@@ -129,7 +129,7 @@ function gwvpmini_RepoViewPageBody()
 		if($bperms == "r") $regd = " selected";
 		if($bperms == "x") $expl = " selected";
 		
-		error_log("BPERMS: $bperms");
+		// error_log("BPERMS: $bperms");
 		
 		if($bperms == "x") $cspan = 3;
 		else $cspan = 2;
@@ -230,12 +230,12 @@ function gwvpmini_UpdateRepoBasePerms()
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
-		error_log("PLOOP:qview".print_r($qspl, true));
+		// error_log("PLOOP:qview".print_r($qspl, true));
 	}
 	
 	if(isset($qspl[1])) $repo_view_call = $qspl[1];
 	else {
-		error_log("PLOOP: no repo name");
+		// error_log("PLOOP: no repo name");
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
 	}
@@ -258,9 +258,9 @@ function gwvpmini_UpdateRepoBasePerms()
 	
 	if(!$owner_view) {
 		gwvpmini_SendMessage("error", "failure updating permission for repo");
-		error_log("PLOOP: attempt to update from non-owner");
+		// error_log("PLOOP: attempt to update from non-owner");
 	} else {
-		error_log("PLOOP: updateds: ".print_r($_REQUEST, true));
+		// error_log("PLOOP: updateds: ".print_r($_REQUEST, true));
 		gwvpmini_ChangeRepoPerm($rid, "b", $_REQUEST["base_perms"]);
 		gwvpmini_SendMessage("info", "Base permissions for repo updated");
 	}
@@ -275,12 +275,12 @@ function gwvpmini_AddRepoReader()
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
-		error_log("PLOOP:qview".print_r($qspl, true));
+		// error_log("PLOOP:qview".print_r($qspl, true));
 	}
 	
 	if(isset($qspl[1])) $repo_view_call = $qspl[1];
 	else {
-		error_log("PLOOP: no repo name");
+		// error_log("PLOOP: no repo name");
 		// TODO: btw, this makes no sense
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
@@ -301,7 +301,7 @@ function gwvpmini_AddRepoReader()
 	}
 	if(!$owner_view) {
 		gwvpmini_SendMessage("error", "failure updating permission for repo");
-		error_log("PLOOP: attempt to update from non-owner");
+		// error_log("PLOOP: attempt to update from non-owner");
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
 	}
@@ -337,12 +337,12 @@ function gwvpmini_AddRepoContributor()
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
-		error_log("PLOOP:qview".print_r($qspl, true));
+		// error_log("PLOOP:qview".print_r($qspl, true));
 	}
 	
 	if(isset($qspl[1])) $repo_view_call = $qspl[1];
 	else {
-		error_log("PLOOP: no repo name");
+		// error_log("PLOOP: no repo name");
 		// TODO: btw, this makes no sense
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
@@ -363,7 +363,7 @@ function gwvpmini_AddRepoContributor()
 	}
 	if(!$owner_view) {
 		gwvpmini_SendMessage("error", "failure updating permission for repo");
-		error_log("PLOOP: attempt to update from non-owner");
+		// error_log("PLOOP: attempt to update from non-owner");
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
 	}
@@ -398,12 +398,12 @@ function gwvpmini_RemoveRepoContributor()
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
-		error_log("PLOOP:qview".print_r($qspl, true));
+		// error_log("PLOOP:qview".print_r($qspl, true));
 	}
 	
 	if(isset($qspl[1])) $repo_view_call = $qspl[1];
 	else {
-		error_log("PLOOP: no repo name");
+		// error_log("PLOOP: no repo name");
 		// TODO: btw, this makes no sense
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
@@ -423,7 +423,7 @@ function gwvpmini_RemoveRepoContributor()
 	}
 	if(!$owner_view) {
 		gwvpmini_SendMessage("error", "failure updating permission for repo");
-		error_log("PLOOP: attempt to update from non-owner");
+		// error_log("PLOOP: attempt to update from non-owner");
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
 	}
@@ -455,12 +455,12 @@ function gwvpmini_RemoveRepoReader()
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
-		error_log("PLOOP:qview".print_r($qspl, true));
+		// error_log("PLOOP:qview".print_r($qspl, true));
 	}
 
 	if(isset($qspl[1])) $repo_view_call = $qspl[1];
 	else {
-		error_log("PLOOP: no repo name");
+		// error_log("PLOOP: no repo name");
 		// TODO: btw, this makes no sense
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
@@ -480,7 +480,7 @@ function gwvpmini_RemoveRepoReader()
 	}
 	if(!$owner_view) {
 		gwvpmini_SendMessage("error", "failure updating permission for repo");
-		error_log("PLOOP: attempt to update from non-owner");
+		// error_log("PLOOP: attempt to update from non-owner");
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
 	}
@@ -510,12 +510,12 @@ function gwvpmini_RepoUpdateDescription()
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
-		error_log("PLOOP:qview".print_r($qspl, true));
+		// error_log("PLOOP:qview".print_r($qspl, true));
 	}
 	
 	if(isset($qspl[1])) $repo_view_call = $qspl[1];
 	else {
-		error_log("PLOOP: no repo name");
+		// error_log("PLOOP: no repo name");
 		// TODO: btw, this makes no sense
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
@@ -535,7 +535,7 @@ function gwvpmini_RepoUpdateDescription()
 	}
 	if(!$owner_view) {
 		gwvpmini_SendMessage("error", "failure updating description for repo");
-		error_log("PLOOP: attempt to update from non-owner");
+		// error_log("PLOOP: attempt to update from non-owner");
 		header("Location: $BASE_URL/view/$repo_view_call");
 		return;
 	}

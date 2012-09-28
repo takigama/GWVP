@@ -14,7 +14,7 @@ if($IS_WEB_REQUEST) {
 function gwvpmini_AdminCallMe()
 {
 
-	//error_log("in admin callme");
+	//// // error_log("in admin callme");
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
@@ -61,7 +61,7 @@ function gwvpmini_AdminCallMe()
 						return "gwvpmini_SwitchAdmin";
 					}
 				} else {
-					error_log("i got here, where next?");
+					// // error_log("i got here, where next?");
 					return "gwvpmini_AdminMainPage";
 				}
 			} else return false;
@@ -155,7 +155,7 @@ function gwvpmini_AdminMainPageBody()
 			$cstat = "Disable";
 		} else 	if($st_t[0] == "2") {
 			$vl = explode(":", $st_t);
-			error_log("VL: ".print_r($vl, true));
+			// // error_log("VL: ".print_r($vl, true));
 			$status = " Awaiting Confirmation (<a href=\"$BASE_URL/register/confirmreg/".$vl[1]."\">Confirm</a>)";
 		}
 		
@@ -327,7 +327,7 @@ function gwvpmini_RemoveUserPageBody()
 		$email = $details[$uid]["email"];
 		$desc = $details[$uid]["desc"];
 		
-		error_log("user dets:".print_r($details, true));
+		//// // error_log("user dets:".print_r($details, true));
 		
 		echo "<h2>Remove User?</h2>";
 		echo "Are you sure you wish to remove the user, $username ($uid) - $fullname - $email - $desc?<br>";
@@ -371,7 +371,7 @@ function gwvpmini_RemoveRepoPageBody()
 		$fullname = $usedet["fullname"];
 		
 
-		error_log("user dets:".print_r($details, true));
+		// // error_log("user dets:".print_r($details, true));
 
 		echo "<h2>Remove User?</h2>";
 		echo "Are you sure you wish to remove the repo, <b>$rname</b> ($rid) - \"$rdesc\" $ownedby?<br>";
@@ -389,7 +389,7 @@ function gwvpmini_ConfRemoveRepo()
 	global $BASE_URL;
 
 	
-	error_log("CONF REMOVE REPO");
+	// // error_log("CONF REMOVE REPO");
 	
 	$rid = -1;
 	if(isset($_REQUEST["q"])) {

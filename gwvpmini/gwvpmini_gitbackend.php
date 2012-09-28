@@ -30,7 +30,7 @@ function gwvpmini_CreateRepoHooks($repopath, $cmdpath)
 {
 	$fp = fopen("$repopath/hooks/pre-receive", "w");
 	
-	if(!$fp) error_log("could not create pre-receive hook");
+	if(!$fp) // error_log("could not create pre-receive hook");
 	
 	// TODO: think about this one
 	$script = '#!/bin/bash'."\n\n".'DCOMMIT=`cat`'."\n".'START=`echo $DCOMMIT|cut -d " " -f 1`'."\n".'END=`echo $DCOMMIT|cut -d " " -f 2`'."\n".'REF=`echo $DCOMMIT|cut -d " " -f 3`'."\n\n";
@@ -45,7 +45,7 @@ function gwvpmini_CreateRepoHooks($repopath, $cmdpath)
 
 	$fp = fopen("$repopath/hooks/update", "w");
 	
-	if(!$fp) error_log("could not create update hook");
+	if(!$fp) // error_log("could not create update hook");
 	
 	// TODO: think about this one
 	$script = "#!/bin/bash\n\n";
@@ -77,13 +77,13 @@ function gwvpmini_gitBackendInterface()
 	
 	
 	/* bizare git problem that ignores 403's or continues on with a push despite them 
-	error_log("FLAP for ".$_SERVER["REQUEST_URI"]);
+	// error_log("FLAP for ".$_SERVER["REQUEST_URI"]);
 	if(isset($_REQUEST)) {
 		$dump = print_r($_REQUEST, true);
-		error_log("FLAP, $dump");
+		// error_log("FLAP, $dump");
 	}
 	if(isset($_SERVER["PHP_AUTH_USER"])) {
-		error_log("FLAP: donut hole");
+		// error_log("FLAP: donut hole");
 	}*/
 	
 
@@ -112,7 +112,7 @@ function gwvpmini_gitBackendInterface()
 	exec("/usr/bin/git update-server-info");
 	
 	if(!file_exists("$repo_base/$repo.git/hooks/pre-receive") || !file_exists("$repo_base/$repo.git/hooks/update")) {
-		error_log("WRITING HOOKS");
+		// error_log("WRITING HOOKS");
 		gwvpmini_CreateRepoHooks("$repo_base/$repo.git", $cmd_line_tool);
 	}
 	
@@ -124,7 +124,7 @@ function gwvpmini_gitBackendInterface()
 	$write = false;
 	if(isset($_REQUEST["service"])) {
 		if($_REQUEST["service"] == "git-receive-pack") {
-			error_log("got write as receivepack in post");
+			// error_log("got write as receivepack in post");
 			$write = true;
 		}
 	}
@@ -142,17 +142,17 @@ function gwvpmini_gitBackendInterface()
 	// next, figure out permissions for repo
 	$rid = gwvpmini_GetRepoId($repo);
 	$uid = -1;
-	error_log("AT THIS POINT WE HAVE $uid, $rid, $repo $person");
+	// error_log("AT THIS POINT WE HAVE $uid, $rid, $repo $person");
 	
 	if(!$person) {
 		if($write) {
-			error_log("ASK FOR BASIC AUTH");
+			// error_log("ASK FOR BASIC AUTH");
 			gwvpmini_AskForBasicAuth();
 			return;
 		} else {
 			$perm = gwvpmini_GetRepoPerm($rid, "a");
 			if($perm < 1) {
-				error_log("ASK FOR BASIC AUTH 2");
+				// error_log("ASK FOR BASIC AUTH 2");
 				gwvpmini_AskForBasicAuth();
 				return;
 			}
@@ -162,7 +162,7 @@ function gwvpmini_gitBackendInterface()
 		$perm = gwvpmini_GetRepoPerm($rid, $uid);
 		if($write) {
 			if($perm < 2) {
-				error_log("SEND FOFF");
+				// error_log("SEND FOFF");
 				gwvpmini_fourZeroThree();
 				return;
 			}
@@ -194,15 +194,15 @@ function gwvpmini_gitBackendInterface()
 
 	// if we made it this far, we a read and we have permissions to do so, just search the file from the repo
 	/*if(file_exists("$repo_base/$repo.git/$newloc")) {
-		error_log("would ask $repo for $repo.git/$newloc from $repo_base/$repo.git/$newloc");
+		// error_log("would ask $repo for $repo.git/$newloc from $repo_base/$repo.git/$newloc");
 		$fh = fopen("$repo_base/$repo.git/$newloc", "rb");
 		
-		error_log("pushing file");
+		// error_log("pushing file");
 		while(!feof($fh)) {
 			echo fread($fh, 8192);
 		}
 	} else {
-		error_log("would ask $repo for $repo/$newloc from $repo_base/$repo/$newloc, NE");
+		// error_log("would ask $repo for $repo/$newloc from $repo_base/$repo/$newloc, NE");
 		gwvpmini_fourZeroFour();
 		return;
 	}*/
@@ -212,7 +212,7 @@ function gwvpmini_gitBackendInterface()
 function gwvpmini_canManageRepo($userid, $repoid)
 {
 	// only the owner or an admin can do these tasks
-	error_log("Checking repoid, $repoid against userid $userid");
+	// error_log("Checking repoid, $repoid against userid $userid");
 	
 	if(gwvpmini_IsUserAdmin(null, null, $userid)) return true;
 	if(gwvpmini_IsRepoOwner($userid, $repoid)) return true;
@@ -239,7 +239,7 @@ function gwvpmini_callGitBackend($username, $repo)
 		$qs = "";
 		foreach($_REQUEST as $key => $var) {
 			if($key != "q") {
-				//error_log("adding, $var from $key");
+				//// error_log("adding, $var from $key");
 				if($qs == "") $qs.="$key=$var";
 				else $qs.="&$key=$var";
 			}
@@ -269,7 +269,7 @@ function gwvpmini_callGitBackend($username, $repo)
 		$procenv["REMOTE_ADDR"] = $_SERVER["REMOTE_ADDR"];
 		$procenv["AUTH_TYPE"] = "Basic";
 		
-		//error_log("PROCENV: ".print_r($procenv,true));
+		//// error_log("PROCENV: ".print_r($procenv,true));
 		
 		if(isset($_SERVER["CONTENT_TYPE"])) { 
 			$procenv["CONTENT_TYPE"] = $_SERVER["CONTENT_TYPE"];
@@ -280,7 +280,7 @@ function gwvpmini_callGitBackend($username, $repo)
 			$procenv["CONTENT_LENGTH"] = $_SERVER["CONTENT_LENGTH"];
 		}
 		
-		error_log("path trans'd is /$repo_base/$repo.git/$euri from $ruri with ".$_REQUEST["q"]." $strrem");
+		// error_log("path trans'd is /$repo_base/$repo.git/$euri from $ruri with ".$_REQUEST["q"]." $strrem");
 		
 		
 		
@@ -293,13 +293,13 @@ function gwvpmini_callGitBackend($username, $repo)
 		while(!$untilblank&&!feof($pipes[1])) {
 			$lines_t = fgets($pipes[1]);
 			$lines = trim($lines_t);
-			error_log("got line: $lines");
+			// error_log("got line: $lines");
 			if($lines_t == "\r\n") {
 				$untilblank = true;
-				error_log("now blank");
+				// error_log("now blank");
 			} else header($lines);
 			if($lines === false) {
-				error_log("got an unexpexted exit...");
+				// error_log("got an unexpexted exit...");
 				exit(0);
 			}
 			
@@ -310,11 +310,11 @@ function gwvpmini_callGitBackend($username, $repo)
 		$continue = true;
 		
 		if(!stream_set_blocking($fh,0)) {
-			error_log("cant set input non-blocking");
+			// error_log("cant set input non-blocking");
 		}
 
 		if(!stream_set_blocking($pipes[1],0)) {
-			error_log("cant set pipe1 non-blocking");
+			// error_log("cant set pipe1 non-blocking");
 		}
 		
 		
@@ -333,7 +333,7 @@ function gwvpmini_callGitBackend($username, $repo)
 				//fwrite($fl, $from_client_data);
 				$client_len = strlen($from_client_data);
 			} else {
-				error_log("client end");
+				// error_log("client end");
 				$client_len = 0;
 				//$continue = false;
 			}
@@ -355,9 +355,9 @@ function gwvpmini_callGitBackend($username, $repo)
 						// TODO: find out why this happens
 						$from_cgi_data = preg_replace("/^\r\n/", "", $from_cgi_data_t);
 						if(strlen($from_cgi_data)!=strlen($from_cgi_data_t)) {
-							error_log("MOOOKS - we did trunc");
+							// error_log("MOOOKS - we did trunc");
 						} else {
-							error_log("MOOOKS - we did not trunc");
+							// error_log("MOOOKS - we did not trunc");
 						}
 						$firstline = false;
 					}
@@ -369,7 +369,7 @@ function gwvpmini_callGitBackend($username, $repo)
 				}
 				$cgi_len = strlen($from_cgi_data);
 			} else {
-				error_log("cgi end");
+				// error_log("cgi end");
 				$cgi_len = 0;
 			}
 			
@@ -377,14 +377,14 @@ function gwvpmini_callGitBackend($username, $repo)
 			else {
 				if($client_len == 0 && $cgi_len == 0) {
 					usleep(200000);
-					error_log("sleep tick");
+					// error_log("sleep tick");
 					$stlimit++;
 					if($stlimit > 2) $continue = false;
 				} else {
 					$stlimit = 0;
-					error_log("sizes: $client_len, $cgi_len");
+					// error_log("sizes: $client_len, $cgi_len");
 					if($cgi_len > 0) {
-						error_log("from cgi: \"$from_cgi_data\"");
+						// error_log("from cgi: \"$from_cgi_data\"");
 					}
 				}
 			}
@@ -417,7 +417,7 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc)
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
 	// phew, this works, but i tell you this - bundles arent quite as nice as they should be
-	error_log("would create $repo_base/$name.git");
+	// error_log("would create $repo_base/$name.git");
 	exec("/usr/bin/git init $repo_base/$name.git --bare > /tmp/gitlog 2>&1");
 	chdir("$repo_base/$name.git");
 	exec("/usr/bin/git update-server-info");

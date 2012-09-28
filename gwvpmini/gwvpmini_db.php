@@ -6,7 +6,7 @@ $DB_CONNECTION = false;
 
 
 global $db_url, $db_type;
-//error_log("in include for database, $db_type, $db_name");
+//// error_log("in include for database, $db_type, $db_name");
 
 
 function gwvpmini_DBExists()
@@ -14,15 +14,15 @@ function gwvpmini_DBExists()
 	global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name;
 	
 	// oh this isnt working. poo.
-	//error_log("checking for $db_name, $db_type");
+	//// error_log("checking for $db_name, $db_type");
 	
 	if($db_type == "sqlite") {
 		if(file_exists($db_name)) {
-			//error_log("Exists");
+			//// error_log("Exists");
 			return true;
 		}
 		else {
-			//error_log("no exists");
+			//// error_log("no exists");
 			return false;
 		}
 	}
@@ -108,7 +108,7 @@ function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
 	
 	$res = $conn->query($sql);
 	
-	error_log("CHANGEREPOPERMS: call with $rid, $uid, $acc");
+	// error_log("CHANGEREPOPERMS: call with $rid, $uid, $acc");
 	
 	$cperms_t = "";
 	foreach($res as $row) {
@@ -125,12 +125,12 @@ function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
 			$permsarray = unserialize(base64_decode($cperms_t));
 			$permsarray[$uid] = $acc;
 			if($acc == 0) {
-				error_log("PERMSUPDATE: REMOVE $uid");
+				// error_log("PERMSUPDATE: REMOVE $uid");
 				unset($permsarray[$uid]);
 			}
 		}
 	} else {
-		error_log("CHANGEREPOPERMS for b of $acc");
+		// error_log("CHANGEREPOPERMS for b of $acc");
 		$permsarray["b"] = $acc;
 	}
 	
@@ -138,7 +138,7 @@ function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
 	if($permsarray["b"] == "a" || $permsarray["b"] == "r") {
 		foreach($permsarray as $key => $val) {
 			if($val == 1) {
-				error_log("CHANGEREPOPERMS removed $key $val for base perm change");
+				// error_log("CHANGEREPOPERMS removed $key $val for base perm change");
 				unset($permsarray[$key]);
 			}
 		}
@@ -159,7 +159,7 @@ function gwvpmini_ChangeRepoPerm($rid, $uid, $acc)
 	
 	$sql = "update repos set repos_perms='$encperms' where repos_id='$rid'";
 
-	error_log("PERMSARRAYNOW $sql ".print_r($permsarray,true));
+	// error_log("PERMSARRAYNOW $sql ".print_r($permsarray,true));
 	
 	$conn->query($sql);
 	
@@ -203,7 +203,7 @@ function gwvpmini_GetRepoPerm($rid, $uid)
 	
 	if($cperms_t === false) return 0;
 	
-	error_log("PERMSCHECK $rid, $uid:".print_r($dets, true));
+	// error_log("PERMSCHECK $rid, $uid:".print_r($dets, true));
 	
 	if($dets === false) return 0;
 	
@@ -211,7 +211,7 @@ function gwvpmini_GetRepoPerm($rid, $uid)
 	
 	$permsarray = unserialize(base64_decode($cperms_t));
 	
-	error_log("PERMSARRAY: ".print_r($permsarray,true));
+	// error_log("PERMSARRAY: ".print_r($permsarray,true));
 	
 	
 	$perm = 0;
@@ -359,7 +359,7 @@ function gwvpmini_ConnectDB()
 	global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name, $DB_CONNECTION;
 
 	// first check if $DB_CONNECTION IS live
-	//error_log("in connection $db_type, $db_name");
+	//// error_log("in connection $db_type, $db_name");
 	$db_url = false;
 
 	if($DB_CONNECTION != false) return $DB_CONNECTION;
@@ -367,7 +367,7 @@ function gwvpmini_ConnectDB()
 	if($db_type == "sqlite") {
 		$db_url = $db_name;
 		if(!file_exists($db_name)) {
-			//error_log("$db_name does not exist - problem");
+			//// error_log("$db_name does not exist - problem");
 			// TODO: NEED A SETUP AGENT!
 			gwvpmini_dbCreateSQLiteStructure($db_name);
 			gwvpmini_setConfigVal("repodir", "$data_directory/repos");
@@ -375,11 +375,11 @@ function gwvpmini_ConnectDB()
 	}
 
 	// and here we go with pdo.
-	error_log("attmpting to open db, $db_type:$db_url");
+	// error_log("attmpting to open db, $db_type:$db_url");
 	try {
 		$DB_CONNECTION = new PDO("$db_type:$db_url");
 	} catch(PDOException $exep) {
-		error_log("execpt on db open");
+		// error_log("execpt on db open");
 		return false;
 	}
 
@@ -478,7 +478,7 @@ function gwvpmini_AddActivityLog($type, $userid, $repoid, $commitid, $commitlog)
 	
 	$sql = "insert into 'activity' values ( null, '$type', '".time()."', '$userid', '$repoid', '$commitid', '$commitlog', '$visibleto')";
 	
-	error_log("SQL IS $sql");
+	// error_log("SQL IS $sql");
 	
 	$res = $conn->query($sql);
 	if(!$res) return -1;
@@ -553,7 +553,7 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	try {
 		$DB_CONNECTION = new PDO("sqlite:$dbloc");
 	} catch(PDOException $exep) {
-		error_log("execpt on db open");
+		// error_log("execpt on db open");
 		return false;
 	}
 
@@ -654,7 +654,7 @@ function gwvpmini_GetRepoDescFromName($reponame)
 	$conn = gwvpmini_ConnectDB();
 
 	$sql = "select repos_description from repos where repos_name='$reponame'";
-	error_log("desc for name sql: $sql");
+	// error_log("desc for name sql: $sql");
 
 	$res = $conn->query($sql);
 
@@ -701,7 +701,7 @@ function gwvpmini_GetRepoOwnerDetailsFromName($reponame)
 	if(!$res) return -1;
 	foreach($res as $row) {
 		$retval = array();
-		error_log("STUFF2: ".print_r($row,true));
+		// error_log("STUFF2: ".print_r($row,true));
 		$retval["id"] = $row["user_id"];
 		$retval["fullname"] = $row["user_full_name"];
 		$retval["username"] = $row["user_username"];
@@ -739,7 +739,7 @@ function gwvpmini_setConfigVal($confname, $confval)
 function gwvpmini_AddRepo($name, $desc, $ownerid)
 {
 	
-	error_log("addrepo in db for $name, $desc, $ownerid");
+	// error_log("addrepo in db for $name, $desc, $ownerid");
 	$conn = gwvpmini_ConnectDB();
 	
 	$perms["b"] = "a";
@@ -757,7 +757,7 @@ function gwvpmini_GetUserId($username)
 	
 	$sql = "select user_id from users where user_username='$username'";
 
-	error_log("userid sql $sql");
+	// error_log("userid sql $sql");
 	
 	$res = $conn->query($sql);
 	
@@ -775,7 +775,7 @@ function gwvpmini_GetUserNameFromEmail($email)
 
 	$sql = "select user_username from users where user_email='$email'";
 
-	error_log("username sql $sql");
+	// error_log("username sql $sql");
 
 	$res = $conn->query($sql);
 
@@ -803,7 +803,7 @@ function gwvpmini_GetOwnedRepos($username)
 	
 	$uid = gwvpmini_GetUserId($username);
 	$sql = "select * from repos where repos_owner='$uid'";
-	error_log("owned repos sql $sql for username $username");
+	// error_log("owned repos sql $sql for username $username");
 	$res = $conn->query($sql);
 	if($username == "") return false;
 	
@@ -814,10 +814,10 @@ function gwvpmini_GetOwnedRepos($username)
 		$retval[$id]["desc"] = $row["repos_description"];
 		$retval[$id]["id"] = $row["repos_id"];
 		$retval[$id]["status"] = $row["repos_status"];
-		error_log(print_r($row, true));
+		// error_log(print_r($row, true));
 	}
 	
-	error_log(print_r($retval, true));
+	// error_log(print_r($retval, true));
 	return $retval;
 }
 
@@ -845,7 +845,7 @@ function gwvpmini_GetContributedRepos($username)
 	$i = 0;
 	foreach($res as $row) {
 		$perms = unserialize(base64_decode($row["repos_perms"]));
-		error_log("CONTRIB: $uid for ".$row["repos_id"]." - ".print_r($perms,true));
+		// error_log("CONTRIB: $uid for ".$row["repos_id"]." - ".print_r($perms,true));
 		if(isset($perms["$uid"])) if($perms["$uid"] > 1) {
 			$rids[$i]["id"] = $row["repos_id"];
 			$rids[$i]["desc"] = $row["repos_description"];
@@ -858,11 +858,11 @@ function gwvpmini_GetContributedRepos($username)
 	$retval = $rids;
 	
 	if($i == 0) {
-		error_log("CONTRIBREPOS: no repos found?");
+		// error_log("CONTRIBREPOS: no repos found?");
 		return false;
 	}
 
-	error_log("CONTRIBREPOS: ".print_r($retval, true));
+	// error_log("CONTRIBREPOS: ".print_r($retval, true));
 	return $retval;
 }
 
@@ -928,10 +928,10 @@ function gwvpmini_findPeopleLike($search)
 	$res = $conn->query($sql);
 	
 	if(!$res) {
-		error_log("SERACHUSER: $sql returned false");
+		// error_log("SERACHUSER: $sql returned false");
 		return false;
 	} else {
-		error_log("SERACHUSER: $sql returned true");
+		// error_log("SERACHUSER: $sql returned true");
 	}
 	
 	$retval = false;
@@ -946,7 +946,7 @@ function gwvpmini_findPeopleLike($search)
 		$retval[$id]["id"] = $row["user_id"];
 	}
 	
-	error_log("SEARCHUSER: array is ".print_r($retval, true));
+	// error_log("SEARCHUSER: array is ".print_r($retval, true));
 	return $retval;
 }
 

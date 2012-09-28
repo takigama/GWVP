@@ -10,10 +10,10 @@ $CALL_ME_FUNCTIONS["search"] = "gwvpmini_SearchCallMe";
 function gwvpmini_SearchCallMe()
 {
 
-	error_log("in repoadmin callme - err?");
-	error_log(print_r($_REQUEST, true));
+	// error_log("in repoadmin callme - err?");
+	// error_log(print_r($_REQUEST, true));
 	if(isset($_REQUEST["q"])) {
-		error_log("in repoadmin callme, for Q");
+		// error_log("in repoadmin callme, for Q");
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
 		if(isset($qspl[0])) {

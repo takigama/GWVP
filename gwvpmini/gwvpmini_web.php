@@ -35,7 +35,7 @@ function gwvpmini_goWeb()
 	
 	ksort($CALL_ME_FUNCTIONS);
 	foreach($CALL_ME_FUNCTIONS as $key => $val) {
-		//error_log("checking callmefunction $key as $val");
+		//// error_log("checking callmefunction $key as $val");
 		$callme = $val();
 		if($callme !== false) {
 			$callme();
@@ -68,7 +68,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 			while(($file = readdir($dh))!==false) {
 				$mt = preg_match("/.*.css$/", $file);
 				if($mt > 0) {
-					error_log("loading css $file");
+					// error_log("loading css $file");
 					echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$BASE_URL/css/$file\">";
 					//echo "required $basedir/$file\n";
 				}
@@ -83,7 +83,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 			while(($file = readdir($dh))!==false) {
 				$mt = preg_match("/.*.js$/", $file);
 				if($mt > 0) {
-					error_log("loading js $file");
+					// error_log("loading js $file");
 					echo "<script type=\"text/javascript\" src=\"$BASE_URL/js/$file\"></script>";
 					//echo "required $basedir/$file\n";
 				}
@@ -126,7 +126,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 		if(function_exists($bodyFunction)) {
 			$bodyFunction();
 		} else {
-			error_log("Got called with non-existant body function, $bodyFunction");
+			// error_log("Got called with non-existant body function, $bodyFunction");
 			gwvpmini_BodyBuilder();
 		}
 	}
@@ -177,7 +177,7 @@ function gwvpmini_MenuBuilder()
 		$menucolor = "";
 		if(isset($_REQUEST["q"])) {
 			$extlink = str_replace("$BASE_URL/", "", $link);
-			error_log("trying to do replace of $BASE_URL in $link, got $extlink for ".$_REQUEST["q"]);
+			// error_log("trying to do replace of $BASE_URL in $link, got $extlink for ".$_REQUEST["q"]);
 			if(stristr($_REQUEST["q"], $extlink)!==false) {
 				$menucolor = " bgcolor=\"#ffdddd\"";
 				
@@ -223,7 +223,7 @@ function gwvpmini_BodyBuilder()
 	if(isset($HOME_PAGE_PROVIDERS)) {
 		ksort($HOME_PAGE_PROVIDERS);
 		foreach($HOME_PAGE_PROVIDERS as $provider) {
-			error_log("Loading home_page_provider, $provider");
+			// error_log("Loading home_page_provider, $provider");
 			$provider();
 		}
 	}
@@ -250,13 +250,13 @@ function gwvpmini_emailToUserLink($email)
 
 function gwvpmini_fourZeroThree()
 {
-	error_log("403 called");
+	// error_log("403 called");
 	header("HTTP/1.1 403 Permission Denied");
 }
 
 function gwvpmini_fourZeroFour()
 {
-	error_log("404 called");
+	// error_log("404 called");
 	header("HTTP/1.1 404 No Such Thing");
 }
 
@@ -279,9 +279,9 @@ function gwvpmini_HtmlGravatar($email, $size, $htmlappend="")
 	global $use_gravatar;
 	
 	if($use_gravatar) {
-		error_log("call to gravatar with yes");
+		// error_log("call to gravatar with yes");
 	} else {
-		error_log("call to gravatar with no");
+		// error_log("call to gravatar with no");
 	}
 	
 	if($use_gravatar == false) return "";

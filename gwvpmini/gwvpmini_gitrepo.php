@@ -15,15 +15,15 @@ $MENU_ITEMS["10repos"]["link"] = "$BASE_URL/repos";
 function gwvpmini_RepoCallMe()
 {
 
-	error_log("in repoadmin callme - err?");
-	error_log(print_r($_REQUEST, true));
+	// error_log("in repoadmin callme - err?");
+	// error_log(print_r($_REQUEST, true));
 	if(isset($_REQUEST["q"])) {
-		error_log("in repoadmin callme, for Q");
+		// error_log("in repoadmin callme, for Q");
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
 		if(isset($qspl[0])) {
 			if($qspl[0] == "repos") {
-				error_log("in repos call");
+				// error_log("in repos call");
 				if(isset($qspl[1])) {
 					if($qspl[1] == "create") {
 						return "gwvpmini_RepoCreate";
@@ -31,7 +31,7 @@ function gwvpmini_RepoCallMe()
 						return "gwvpmini_RepoMainPage";
 					}
 				} else {
-					error_log("i got here, where next?");
+					// error_log("i got here, where next?");
 					return "gwvpmini_RepoMainPage";
 				}
 			} else return false;
@@ -67,7 +67,7 @@ function gwvpmini_RepoMainPageBody()
 				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
-				error_log("CMD: $cmd");
+				// error_log("CMD: $cmd");
 				//system("$cmd");
 				$fls = popen($cmd, "r");
 				$tks = "";
@@ -96,7 +96,7 @@ function gwvpmini_RepoMainPageBody()
 				$desc = $repo["desc"];
 				$repo_base = gwvpmini_getConfigVal("repodir");
 				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
-				error_log("CMD: $cmd");
+				// error_log("CMD: $cmd");
 				//system("$cmd");
 				$fls = popen($cmd, "r");
 				$tks = "";
@@ -152,7 +152,7 @@ function gwvpmini_GitLogProvider()
 				echo "<td>";
 				$repo_base = gwvpmini_getConfigVal("repodir");
 				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
-				error_log("CMD: $cmd");
+				// error_log("CMD: $cmd");
 				//system("$cmd");
 				$fls = popen($cmd, "r");
 				$tks = "";
@@ -255,7 +255,7 @@ function gwvpmini_RemoveRepo($rid)
 	
 	$rname = $repdet["name"];
 	
-	error_log("FROM PANTS:".print_r($repdet,true)." ----------- ".print_r($rname, true));
+	// error_log("FROM PANTS:".print_r($repdet,true)." ----------- ".print_r($rname, true));
 	
 	if($repdet != false && $rname != "") {
 		if(file_exists("$repo_base/$rname.git")) {
@@ -269,7 +269,7 @@ function gwvpmini_RemoveRepo($rid)
 
 function gwvpmini_RecursiveDelete($fpath)
 {
-	error_log("RECURSEDETELE: ".$fpath);
+	// error_log("RECURSEDETELE: ".$fpath);
 	if(is_file($fpath)){
 		return @unlink($fpath);
 	}

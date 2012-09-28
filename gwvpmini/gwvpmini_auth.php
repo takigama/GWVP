@@ -7,7 +7,7 @@ $CALL_ME_FUNCTIONS["auth"] = "gwvpmini_AuthCallMe";
 function gwvpmini_AuthCallMe()
 {
 
-	//error_log("in repoadmin callme");
+	//// error_log("in repoadmin callme");
 	if(isset($_REQUEST["q"])) {
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
@@ -98,7 +98,7 @@ function gwvpmini_isLoggedIn()
 
 function gwvpmini_AskForBasicAuth()
 {
-	error_log("SEND BASIC AUTH");
+	// error_log("SEND BASIC AUTH");
 	header_remove("Pragma");
 	header_remove("Cache-Control");
 	header_remove("Set-Cookie");
@@ -124,14 +124,14 @@ function gwvpmini_checkBasicAuthLogin()
 		$pass = $_SERVER["PHP_AUTH_PW"];
 	} else return false;
 	
-	error_log("IN CHECK FOR BASIC AUTH: $user");
+	// error_log("IN CHECK FOR BASIC AUTH: $user");
 	
-	error_log("passing basic auth for $user, $pass to backend");
+	// error_log("passing basic auth for $user, $pass to backend");
 	$auth = gwvpmini_authUserPass($user, $pass);
 	if($auth !== false) {
-		error_log("auth passes");
+		// error_log("auth passes");
 	} else {
-		error_log("auth failes");
+		// error_log("auth failes");
 	}
 
 	return $auth;
@@ -159,7 +159,7 @@ function gwvpmini_authUserPass($user, $pass)
 {
 	$details = gwvpmini_getUser($user);
 	if($details == false) {
-		error_log("no user details for $user");
+		// error_log("no user details for $user");
 		return false;
 	}
 	

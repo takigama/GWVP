@@ -1,5 +1,5 @@
 <?php
-error_log("INCALLSTART ".print_r($_COOKIE, true)." -------------------- ".print_r($_SERVER,true)." ---------- ".print_r($_REQUEST, true));
+// error_log("INCALLSTART ".print_r($_COOKIE, true)." -------------------- ".print_r($_SERVER,true)." ---------- ".print_r($_REQUEST, true));
 $WEB_ROOT_FS = realpath(dirname(__FILE__));
 $BASE_URL = dirname($_SERVER["PHP_SELF"]);
 
@@ -20,7 +20,7 @@ if(isset($noconfig)) {
 	return;
 }
 
-error_log("CMDLINETOOL: ".$cmd_line_tool);
+// error_log("CMDLINETOOL: ".$cmd_line_tool);
 
 // need to make this db agnostic
 if(!gwvpmini_DBExists($db_name)) {
@@ -31,7 +31,7 @@ if(!gwvpmini_DBExists($db_name)) {
 	gwvpmini_setConfigVal("repodir", "$data_directory/repos");
 }
 
-error_log("REQUEST BEGIN");
+// error_log("REQUEST BEGIN");
 gwvpmini_goWeb();
 
 

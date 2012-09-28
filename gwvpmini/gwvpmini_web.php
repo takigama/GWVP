@@ -95,7 +95,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	// start body
 	echo "</head><body>";
 	
-	echo "<h1>Git over Web Via PHP</h2>";
+	echo "<h1>Git over Web Via PHP</h1>";
 	
 	
 	echo "<table width=\"100%\">";

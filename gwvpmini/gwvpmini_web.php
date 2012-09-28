@@ -59,7 +59,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	global $WEB_ROOT_FS, $BASE_URL;
 	
 	// a simple web page layout that loads any css and js files that exist in the css and js directories
-	echo "<html><head><title>GWVP Mini</title>";
+	echo "<html><head><title>GWVP</title>";
 	
 	// load css
 	if(file_exists("$WEB_ROOT_FS/css")) {
@@ -95,7 +95,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	// start body
 	echo "</head><body>";
 	
-	echo "<h1>Git over Web Via PHP - Mini Version</h2>";
+	echo "<h1>Git over Web Via PHP</h2>";
 	
 	
 	echo "<table width=\"100%\">";

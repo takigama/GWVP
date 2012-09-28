@@ -220,7 +220,6 @@ function gwvpmini_BodyBuilder()
 {
 	global $HOME_PAGE_PROVIDERS;
 	
-	echo "I AM THE MAIN BODY, FEAR ME!!!! - have no idea whats going to go here";
 	if(isset($HOME_PAGE_PROVIDERS)) {
 		ksort($HOME_PAGE_PROVIDERS);
 		foreach($HOME_PAGE_PROVIDERS as $provider) {

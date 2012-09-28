@@ -122,11 +122,11 @@ function gwvpmini_AdminMainPageBody()
 	
 	$totalusers = gwvpmini_GetNUsers();
 	echo "<table><tr valign=\"top\"><td>";
-	echo "$register<br>$regconfirm<br>$usegrav<br>$forcessl<br>";
-	echo "<h2>Users - $totalusers</h2>";
+	echo "<H2>Settings</h2>$register<br>$regconfirm<br>$usegrav<br>$forcessl<br>";
 	echo "<form method=\"post\" action=\"$BASE_URL/admin/changefromemail\">";
 	echo "Address emails are sent from <input type=\"text\" name=\"fromemail\" value=\"$confirm_from_address\"><input type=\"submit\" name=\"Update\" value=\"Update\"><br>";
 	echo "</form>";	
+	echo "<h2>Users - $totalusers</h2>";
 
 	echo "<table border=\"1\">";
 	echo "<tr><th>Username</th><th>Email Address</th><th>Full Name</th><th>Description</th><th>Status</th><th>Control</th></tr>";

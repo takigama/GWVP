@@ -17,6 +17,9 @@ function gwvpmini_SearchCallMe()
 		$query = $_REQUEST["q"];
 		$qspl = explode("/", $query);
 		if(isset($qspl[0])) {
+			if($qspl[0] == "search_redirs") {
+				return "gwvpmini_SearchMainPageRedir";
+			}
 			if($qspl[0] == "search") {
 				return "gwvpmini_SearchMainPage";
 			} else return false;
@@ -32,7 +35,7 @@ function gwvpmini_SearchBuilder()
 {
 	global $BASE_URL;
 	
-	echo "<form method=\"post\" action=\"$BASE_URL/search\">";
+	echo "<form method=\"post\" action=\"$BASE_URL/search_redirs\">";
 	echo "<input type=\"text\" name=\"searchstring\"><input type=\"submit\" name=\"Search\" value=\"Seach\">";
 	echo "</form>";
 		
@@ -43,11 +46,31 @@ function gwvpmini_SearchMainPage()
 	gwvpmini_goMainPage("gwvpmini_SearchMainPageBody");
 }
 
+function gwvpmini_SearchMainPageRedir()
+{
+	global $BASE_URL;
+	
+	$_SESSION["search"] = $_REQUEST["searchstring"];
+	header("Location: $BASE_URL/search");
+	
+	return;
+}
+
 function gwvpmini_SearchMainPageBody()
 {
 	global $BASE_URL;
 	
-	$search = $_REQUEST["searchstring"];
+	$search = "";
+	if(isset($_SESSION["search"])) {
+		$search = $_SESSION["search"];
+		unset($_SESSION["search"]);
+	} else {
+		$query = $_REQUEST["q"];
+		$qspl = explode("/", $query);
+		if(isset($qspl[1])) {
+			$search = $qspl[1];
+		}
+	}
 	
 	$reps = gwvpmini_findReposLike($search);
 	$ppls = gwvpmini_findPeopleLike($search);

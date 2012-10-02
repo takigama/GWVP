@@ -413,7 +413,7 @@ function gwvpmini_repoExists($name)
 // 0 - anyone can clone/read, only owner can write
 // 1 - noone can clone/read, repo is visible (i.e. name), only owner can read/write repo
 // 2 - only owner can see anything
-function gwvpmini_createGitRepo($name, $ownerid, $desc)
+function gwvpmini_createGitRepo($name, $ownerid, $desc, $clonefrom)
 {
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
@@ -424,7 +424,7 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc)
 	exec("/usr/bin/git update-server-info");
 
 	// gwvpmini_AddRepo($reponame, $repodesc, $repoowner, $defaultperms = 0)
-	gwvpmini_AddRepo($name, $desc, $ownerid);
+	gwvpmini_AddRepo($name, $desc, $ownerid, $clonefrom);
 	
 	return true;
 }

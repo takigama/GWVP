@@ -532,6 +532,7 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	"repos_owner" INTEGER,
 	"repos_perms" TEXT,
 	"repos_status" TEXT,
+	"repos_origin" TEXT,
 	UNIQUE(repos_name)
 	)';
 
@@ -752,7 +753,7 @@ function gwvpmini_setConfigVal($confname, $confval)
 	return $conn->query($sql);
 }
 
-function gwvpmini_AddRepo($name, $desc, $ownerid)
+function gwvpmini_AddRepo($name, $desc, $ownerid, $clonefrom)
 {
 	
 	// error_log("addrepo in db for $name, $desc, $ownerid");
@@ -762,7 +763,9 @@ function gwvpmini_AddRepo($name, $desc, $ownerid)
 	
 	$encperms = base64_encode(serialize($perms));
 	
-	$sql = "insert into repos values (null, '$name', '$desc', '$ownerid', '$encperms', 0)";
+	if($clonefrom === false) $clonefrom = "";
+	
+	$sql = "insert into repos values (null, '$name', '$desc', '$ownerid', '$encperms', 0, '$clonefrom')";
 	
 	$conn->query($sql);
 }

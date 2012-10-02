@@ -186,6 +186,7 @@ function gwvpmini_GitCreateRepoForm()
 	echo "<option value=\"perms-registered\">Must be Registered To Read</option>";
 	echo "<option value=\"perms-onlywrite\">Only Writers can Read</option>";
 	echo "</select>";
+	echo "<tr><th>Clone From</th><td><input type=\"text\" name=\"clonefrom\"></td></tr>";
 	echo "</td></tr>";
 	echo "<tr><td colspan=\"2\"><input type=\"submit\" name=\"Create\" value=\"Create\"></td></tr>";
 	echo "</table>";
@@ -211,6 +212,13 @@ function gwvpmini_RepoCreate()
 		$inputcheckerror = "Repo name contains invalid characters, repos can only contain a-z, A-Z, 0-9, _, - and .";
 	}
 	
+	$clonefrom = false;
+	if(isset($_REQUEST["clonefrom"])) {
+		if($_REQUEST["clonefrom"] != "") {
+			$clonefrom = $_REQUEST["clonefrom"];
+		}
+	}
+	
 	if(!$inputcheck) {
 		gwvpmini_SendMessage("error", "$inputcheckerror");
 		header("Location: $BASE_URL/repos");
@@ -220,7 +228,7 @@ function gwvpmini_RepoCreate()
 			gwvpmini_SendMessage("error", "Repo ".$_REQUEST["reponame"]." already exists");
 			header("Location: $BASE_URL/repos");
 		} else {
-			gwvpmini_createGitRepo($_REQUEST["reponame"], $_SESSION["id"], $_REQUEST["repodesc"], $_REQUEST["perms"]);
+			gwvpmini_createGitRepo($_REQUEST["reponame"], $_SESSION["id"], $_REQUEST["repodesc"], $_REQUEST["perms"], $clonefrom);
 			gwvpmini_SendMessage("info", "Repo ".$_REQUEST["reponame"]." has been created");
 			header("Location: $BASE_URL/repos");
 		}

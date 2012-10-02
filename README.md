@@ -15,6 +15,10 @@ Currently the code-base is a bit messy but that will improve over time.
 Installation
 ============
 
+Note: the installation assumes the locations for things like "git" and
+git-http-backened, if yours arent in the normal ubuntu locale for that then
+you will need to edit a number of files to point it at the proper location
+
 Ubuntu
 You'll need to add following packages:
 

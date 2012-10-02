@@ -3,7 +3,7 @@ global $HOME_PAGE_PROVIDERS;
 
 
 $CALL_ME_FUNCTIONS["repoadmin"] = "gwvpmini_RepoCallMe";
-$HOME_PAGE_PROVIDERS["gitlog"] = "gwvpmini_GitLogProvider";
+$HOME_PAGE_PROVIDERS["00gitlog"] = "gwvpmini_GitLogProvider";
 
 
 // the home_page_provders bit is an array
@@ -169,15 +169,6 @@ function gwvpmini_GitLogProvider()
 			echo "</table>";
 		}
 	}
-	
-	$logs = gwvpmini_GetActivityLog();
-	if($logs !== null) {
-		echo "<h2>Global Log</h2><table>";
-		foreach($logs as $ents) {
-			echo "<tr><td>".$ents["type"]."</td><td>".$ents["commitid"]."</td></tr>";
-		}
-		echo "</table>";
-	}
 }
 
 function gwvpmini_GitCreateRepoForm()
@@ -280,6 +271,13 @@ function gwvpmini_RecursiveDelete($fpath)
 		}
 		return @rmdir($fpath);
 	}
+}
+
+function gwvpmini_CompressCommitId($cid)
+{
+	$compressedcid = substr($cid, 0, 5)."...".substr($cid, strlen($cid)-5, strlen($cid));
+	
+	return $compressedcid;
 }
 	
 ?>

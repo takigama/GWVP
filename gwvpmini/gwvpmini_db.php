@@ -55,6 +55,46 @@ function gwvpmini_getUser($username=null, $email=null, $id=null)
 
 }
 
+function gwvpmini_GetActivityLog($nentries = 20, $forid=-1)
+{
+	/*
+	 * 		"activity_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+		"activity_type" TEXT,
+		"activity_date" TEXT,
+		"activity_user" TEXT,
+		"activity_repo" TEXT,
+		"activity_commitid" TEXT,
+		"activity_commitlog" TEXT,
+		"activity_visibleto" TEXT
+
+	 */
+	$conn = gwvpmini_ConnectDB();
+	
+	if($forid == -1) {
+		// we're searching for anonymous ones
+		$sql = "select * from activity where activity_visibleto='a' order by activity_date desc limit $nentries";
+	} else {
+		$sql = "select * from activity where activity_visibleto='a' or activity_visibleto='r' or activity_visibleto like '%:$forid:%' order by activity_date desc limit $nentries";
+	}
+	
+	$vls = $conn->query($sql);
+	
+	$nent = 0;
+	$ret = array();
+	if($vls !== false) foreach($vls as $vals) {
+		$ret[$nent]["type"] = $vals["activity_type"];
+		$ret[$nent]["date"] = $vals["activity_date"];
+		$ret[$nent]["userid"] = $vals["activity_user"];
+		$ret[$nent]["repoid"] = $vals["activity_repo"];
+		$ret[$nent]["commitid"] = $vals["activity_commitid"];
+		$ret[$nent]["commitlog"] = $vals["activity_commitlog"];
+		$nent++;
+	}
+	
+	if($nent == 0) return false;
+	else return $ret;
+}
+
 
 function gwvpmini_getRepo($ownerid=null, $name=null, $id=null)
 {
@@ -431,31 +471,7 @@ function gwvpmini_AddUser($username, $password, $fullname, $email, $desc, $level
 	return $retval;
 }
 
-function gwvpmini_GetActivityLog($nentries = 100)
-{
-	$conn = gwvpmini_ConnectDB();
-	
-	$sql = "select * from activity order by activity_date desc limit 100";
-
-	$res = $conn->query($sql);
-	
-	$logs = null;
-	$i = 0;
-	foreach($res as $row) {
-		$logs[$i]["type"] = $row["activity_type"];
-		$logs[$i]["date"] = $row["activity_date"];
-		$logs[$i]["userid"] = $row["activity_user"];
-		$logs[$i]["repoid"] = $row["activity_repo"];
-		$logs[$i]["commitid"] = $row["activity_commitid"];
-		$logs[$i]["commitlog"] = $row["activity_commitlog"];
-		$logs[$i]["visibleto"] = $row["activity_visibleto"];
-		$i++;
-	}
-	
-	return $logs;
-}
-
-function gwvpmini_AddActivityLog($type, $userid, $repoid, $commitid, $commitlog)
+function gwvpmini_AddActivityLog($type, $userid, $repoid, $commitid, $commitlog, $visibleto="a")
 {
 	/*
 	 * 	CREATE TABLE "activity" (
@@ -474,7 +490,7 @@ function gwvpmini_AddActivityLog($type, $userid, $repoid, $commitid, $commitlog)
 	$conn = gwvpmini_ConnectDB();
 	
 	// TODO: implement visibility
-	$visibleto = "a";
+	//$visibleto = "a";
 	
 	$sql = "insert into 'activity' values ( null, '$type', '".time()."', '$userid', '$repoid', '$commitid', '$commitlog', '$visibleto')";
 	

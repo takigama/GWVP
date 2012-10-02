@@ -26,16 +26,15 @@ function gwvpmini_gitControlCallMe()
 }
 
 
-function gwvpmini_CreateRepoHooks($repopath, $cmdpath)
+function gwvpmini_CreateRepoHooks($repopath, $cmdpath, $reponame)
 {
 	$fp = fopen("$repopath/hooks/pre-receive", "w");
 	
-	if(!$fp) // error_log("could not create pre-receive hook");
+	if(!$fp) error_log("could not create pre-receive hook");
 	
 	// TODO: think about this one
-	$script = '#!/bin/bash'."\n\n".'DCOMMIT=`cat`'."\n".'START=`echo $DCOMMIT|cut -d " " -f 1`'."\n".'END=`echo $DCOMMIT|cut -d " " -f 2`'."\n".'REF=`echo $DCOMMIT|cut -d " " -f 3`'."\n\n";
-	$script .= "php $cmdpath pre-receive ";
-	$script .= '$START $END $REF'."\n\n";
+	//$script = '#!/bin/bash'."\n\n".'DCOMMIT=`cat`'."\n".'START=`echo $DCOMMIT|cut -d " " -f 1`'."\n".'END=`echo $DCOMMIT|cut -d " " -f 2`'."\n".'REF=`echo $DCOMMIT|cut -d " " -f 3`'."\n\n";
+	$script = "#!/bin/bash\n\nDCOMMIT=".'`cat`'."\n\nphp $cmdpath $reponame \$REMOTE_USER pre-receive \$DCOMMIT\n\n";
 	fwrite($fp, $script);
 	
 	fclose($fp);
@@ -45,12 +44,11 @@ function gwvpmini_CreateRepoHooks($repopath, $cmdpath)
 
 	$fp = fopen("$repopath/hooks/update", "w");
 	
-	if(!$fp) // error_log("could not create update hook");
+	if(!$fp) error_log("could not create update hook");
 	
 	// TODO: think about this one
-	$script = "#!/bin/bash\n\n";
-	$script .= "php $cmdpath update ";
-	$script .= '$1 $2 $3'."\n\n";
+	unset($script);
+	$script = "#!/bin/bash\n\nphp $cmdpath $reponame \$REMOTE_USER update \$1 \$2 \$3\n\n";
 	fwrite($fp, $script);
 	
 	fclose($fp);
@@ -86,7 +84,7 @@ function gwvpmini_gitBackendInterface()
 		// error_log("FLAP: donut hole");
 	}*/
 	
-
+	error_log("REQUESTINBACKEND: ".print_r($_REQUEST, true));
 	
 	$repo = "";
 	$repoid = false;
@@ -113,7 +111,7 @@ function gwvpmini_gitBackendInterface()
 	
 	if(!file_exists("$repo_base/$repo.git/hooks/pre-receive") || !file_exists("$repo_base/$repo.git/hooks/update")) {
 		// error_log("WRITING HOOKS");
-		gwvpmini_CreateRepoHooks("$repo_base/$repo.git", $cmd_line_tool);
+		gwvpmini_CreateRepoHooks("$repo_base/$repo.git", $cmd_line_tool, $repo);
 	}
 	
 	
@@ -128,7 +126,7 @@ function gwvpmini_gitBackendInterface()
 			$write = true;
 		}
 	}
-	
+	if(preg_match("/.*git-receive-pack$/", $_REQUEST["q"])) $write = true;
 	//$write = true;
 	// THIS MAY CAUSE ISSUES LATER ON but we do it cause the git client ignores our 403 when it uses git-receive-pack after an auth
 	// no, this isnt a solution cause auth'd read attempts will come up as writes...
@@ -182,8 +180,11 @@ function gwvpmini_gitBackendInterface()
 	}
 	
 	// if its a write, we check (before and after) the branch/tag info to see if they were updated
-	//if($write) {
-	//}
+	if($write) {
+		error_log("REQUESTINBACKEND: processed as write");
+	} else {
+		error_log("REQUESTINBACKEND: processed as read");
+	}
 	
 	gwvpmini_callGitBackend($person, $repo);
 	

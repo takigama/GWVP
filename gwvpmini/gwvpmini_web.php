@@ -119,9 +119,9 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	
 	echo "</tr>";
 	
-	echo "<tr><td colspan=\"4\">";
+	echo "<tr width=\"100%\"><td colspan=\"4\">";
 	
-	echo "<table><tr><td>";
+	echo "<table width=\"100%\"><tr width=\"100%\" valign=\"top\"><td>";
 	if($bodyFunction == null) {
 		gwvpmini_BodyBuilder();
 	} else {

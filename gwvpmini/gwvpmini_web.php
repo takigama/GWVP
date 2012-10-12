@@ -119,7 +119,9 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	
 	echo "</tr>";
 	
-	echo "<tr><td colspan=\"2\">";
+	echo "<tr><td colspan=\"4\">";
+	
+	echo "<table><tr><td>";
 	if($bodyFunction == null) {
 		gwvpmini_BodyBuilder();
 	} else {
@@ -130,6 +132,12 @@ function gwvpmini_goMainPage($bodyFunction = null)
 			gwvpmini_BodyBuilder();
 		}
 	}
+	
+	echo "</td><td align=\"right\">";
+	
+	gwvpmini_ChatBuilder();
+	echo "</td></tr></table>";
+	
 	echo "</td></tr>";
 	
 	echo "<tr><td>";
@@ -159,6 +167,11 @@ function gwvpmini_MessageBuilder()
 		unset($_SESSION["message"]);
 		if(isset($_SESSION["messagetype"])) unset($_SESSION["messagetype"]);
 	}
+}
+
+function gwvpmini_ChatBuilder()
+{
+	gwvpmini_DisplayChat();
 }
 
 // builds the menu structure

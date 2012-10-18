@@ -63,6 +63,9 @@ function gwvpmini_RepoMainPageBody()
 			foreach($repos as $repo) {
 				$name = $repo["name"];
 				$desc = $repo["desc"];
+				
+				if($desc == "") $desc = "none";
+				
 				$repo_base = gwvpmini_getConfigVal("repodir");
 				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
@@ -148,6 +151,8 @@ function gwvpmini_GitLogProvider()
 			foreach($repos as $repo) {
 				$name = $repo["name"];
 				$desc = $repo["desc"];
+				
+				if($desc == "") $desc = "-";
 				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
 				echo "<td>";
 				$repo_base = gwvpmini_getConfigVal("repodir");
@@ -178,16 +183,15 @@ function gwvpmini_GitCreateRepoForm()
 	echo "<form method=\"post\" action=\"$BASE_URL/repos/create\">";
 	echo "<table border=\"1\">";
 	echo "<tr><th colspan=\"2\">Create Repo</th></tr>";
-	echo "<tr><th>Repo Name</th><td><input type=\"text\" name=\"reponame\"></td></tr>";
-	echo "<tr><th>Repo Description</th><td><input type=\"text\" name=\"repodesc\"></td></tr>";
+	echo "<tr><th>Repo Name</th><td><input type=\"text\" name=\"reponame\"></td><td>Name of your repo - letters, numbers _ and - only</td></tr>";
+	echo "<tr><th>Repo Description</th><td><input type=\"text\" name=\"repodesc\"></td><td>Description of your repo</td></tr>";
 	echo "<tr><th>Read Permissions</th><td>";
 	echo "<select name=\"perms\">";
 	echo "<option value=\"perms-public\">Anyone Can Read</option>";
 	echo "<option value=\"perms-registered\">Must be Registered To Read</option>";
 	echo "<option value=\"perms-onlywrite\">Only Writers can Read</option>";
-	echo "</select>";
-	echo "<tr><th>Clone From</th><td><input type=\"text\" name=\"clonefrom\"></td></tr>";
-	echo "</td></tr>";
+	echo "</select></td><td>The basic permissions for the initial repo creation</td></tr>";
+	echo "<tr><th>Clone From</th><td><input type=\"text\" name=\"clonefrom\"></td><td>Either a repo name (existing on this site) or a git url to clone from (blank for none)</td></tr>";
 	echo "<tr><td colspan=\"2\"><input type=\"submit\" name=\"Create\" value=\"Create\"></td></tr>";
 	echo "</table>";
 	echo "</form>";
@@ -201,6 +205,7 @@ function gwvpmini_RepoCreate()
 	// TODO: check the stuff out
 	// first reponame
 	$inputcheck = true;
+	
 
 	// remove a .git at the end if it was input
 	$_REQUEST["reponame"] = preg_replace("/\.git$/", "", $_REQUEST["reponame"]);
@@ -213,9 +218,24 @@ function gwvpmini_RepoCreate()
 	}
 	
 	$clonefrom = false;
+	$fromremote = false;
 	if(isset($_REQUEST["clonefrom"])) {
 		if($_REQUEST["clonefrom"] != "") {
 			$clonefrom = $_REQUEST["clonefrom"];
+			if(preg_match("/git.*:\/\/.*/", $clonefrom)>0) {
+				$fromremote = true;
+			}
+			if(preg_match("/http.*\:\/\//", $clonefrom)>0) $fromremote = true;
+		}
+	}
+	
+	if($clonefrom !== false && $fromremote == false) {
+		// check the local repo exists
+		$rn = gwvpmini_getRepo(null, $clonefrom, null);
+		if($rn == false) {
+			gwvpmini_SendMessage("error", "local repo $clonefrom given as upstream clone, however $clonefrom doesnt exist on this site");
+			header("Location: $BASE_URL/repos");
+			return;
 		}
 	}
 	

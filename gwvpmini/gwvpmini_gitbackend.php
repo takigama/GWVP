@@ -417,14 +417,19 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc, $clonefrom)
 {
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
+	if($clonefrom !== false) {
+		
+	} else {
+	
 	// phew, this works, but i tell you this - bundles arent quite as nice as they should be
 	// error_log("would create $repo_base/$name.git");
-	exec("/usr/bin/git init $repo_base/$name.git --bare > /tmp/gitlog 2>&1");
-	chdir("$repo_base/$name.git");
-	exec("/usr/bin/git update-server-info");
-
-	// gwvpmini_AddRepo($reponame, $repodesc, $repoowner, $defaultperms = 0)
-	gwvpmini_AddRepo($name, $desc, $ownerid, $clonefrom);
+		exec("/usr/bin/git init $repo_base/$name.git --bare > /tmp/gitlog 2>&1");
+		chdir("$repo_base/$name.git");
+		exec("/usr/bin/git update-server-info");
+	
+		// gwvpmini_AddRepo($reponame, $repodesc, $repoowner, $defaultperms = 0)
+		gwvpmini_AddRepo($name, $desc, $ownerid, $clonefrom);
+	}
 	
 	return true;
 }

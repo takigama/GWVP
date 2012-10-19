@@ -25,6 +25,9 @@ if(isset($argv["3"])) {
 		case "pre-receive":
 			gwvpcmdtool_PreReceive();
 			break;
+		case "backgroundclone":
+			gwvpcmdtool_BackGroundClone();
+			break;
 		default:
 			gwvpcmdtool_Usage();
 	}
@@ -67,6 +70,11 @@ function gwvpcmdtool_Usage()
 	echo "Usage: ".$argv[0]." this tool should not be called directly by user\n";
 }
 
+
+function gwvpcmdtool_BackGroundClone()
+{
+	// here we parse arguments and have stuff with things and its 6am why am i doing this right now?
+}
 
 // update will log things like branch and tag creations
 function gwvpcmdtool_UpdateHook()

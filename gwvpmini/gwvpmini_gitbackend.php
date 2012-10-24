@@ -107,7 +107,8 @@ function gwvpmini_gitBackendInterface()
 	
 	// we do an update server cause its weird and i cant figure out when it actually needs to happen
 	chdir("$repo_base/$repo.git");
-	exec("/usr/bin/git update-server-info");
+	// dont believe i have to do this
+	//exec("/usr/bin/git update-server-info");
 	
 	if(!file_exists("$repo_base/$repo.git/hooks/pre-receive") || !file_exists("$repo_base/$repo.git/hooks/update")) {
 		// error_log("WRITING HOOKS");
@@ -413,22 +414,25 @@ function gwvpmini_repoExists($name)
 // 0 - anyone can clone/read, only owner can write
 // 1 - noone can clone/read, repo is visible (i.e. name), only owner can read/write repo
 // 2 - only owner can see anything
-function gwvpmini_createGitRepo($name, $ownerid, $desc, $clonefrom)
+function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $isremoteclone)
 {
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
 	if($clonefrom !== false) {
-		
+		error_log("how did i end up in clonefrom? $clonefrom");
+		if(!$isremoteclone) {
+			exec("/usr/bin/git clone --bare $repo_base/$clonefrom.git $repo_base/$name.git >> /tmp/gitlog 2>&1");
+		}
 	} else {
 	
 	// phew, this works, but i tell you this - bundles arent quite as nice as they should be
 	// error_log("would create $repo_base/$name.git");
-		exec("/usr/bin/git init $repo_base/$name.git --bare > /tmp/gitlog 2>&1");
+		exec("/usr/bin/git init $repo_base/$name.git --bare >> /tmp/gitlog 2>&1");
 		chdir("$repo_base/$name.git");
 		exec("/usr/bin/git update-server-info");
 	
 		// gwvpmini_AddRepo($reponame, $repodesc, $repoowner, $defaultperms = 0)
-		gwvpmini_AddRepo($name, $desc, $ownerid, $clonefrom);
+		gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);
 	}
 	
 	return true;

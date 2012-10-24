@@ -753,13 +753,13 @@ function gwvpmini_setConfigVal($confname, $confval)
 	return $conn->query($sql);
 }
 
-function gwvpmini_AddRepo($name, $desc, $ownerid, $clonefrom)
+function gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom)
 {
 	
 	// error_log("addrepo in db for $name, $desc, $ownerid");
 	$conn = gwvpmini_ConnectDB();
 	
-	$perms["b"] = "a";
+	$perms["b"] = $defperms;
 	
 	$encperms = base64_encode(serialize($perms));
 	

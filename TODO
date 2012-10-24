@@ -1,0 +1,16 @@
+First (for beta release):
+
+need a standard git log parser/collector deal
+need to add activity for repo creation
+get clone working properly
+put "system'd" stuff into variables
+
+Next:
+
+ability to git-view a source code base?
+Chat between people on the site - simplistic chat (or maybe just a simple form that'll send an email)
+
+Long term:
+
+link multiple sites together
+deal with pull's between forks of a repo

@@ -71,7 +71,8 @@ function gwvpmini_HomePageActivityLog()
 {
 	global $BASE_URL;
 	
-	$id = $_SESSION["id"];
+	$id = -1;
+	if(isset($_SESSION["id"])) $id = $_SESSION["id"];
 	
 	if($id < 0) {
 		$ents = gwvpmini_GetActivityLog();
@@ -81,7 +82,7 @@ function gwvpmini_HomePageActivityLog()
 	
 	echo "<h2>News</h2>";
 	echo "<table border=\"1\">";
-	foreach($ents as $vals) {
+	if($ents != null) foreach($ents as $vals) {
 		/*
 		 * 		$ret[$nent]["type"] = $vals["activity_type"];
 		$ret[$nent]["date"] = $vals["activity_date"];

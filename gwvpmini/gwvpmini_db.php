@@ -95,7 +95,7 @@ function gwvpmini_GetActivityLog($nentries = 20, $forid=-1)
 	else return $ret;
 }
 
-
+// TODO: deal with multiple repos from one ownerid
 function gwvpmini_getRepo($ownerid=null, $name=null, $id=null)
 {
 	$conn = gwvpmini_ConnectDB();
@@ -368,6 +368,17 @@ function gwvpmini_EnableUser($uid)
 	if($uid < 0) return;
 
 	$sql = "update users set user_status=0 where user_id='$uid'";
+
+	return $conn->query($sql);
+}
+
+function gwvpmini_SetRepoCloning($rid)
+{
+	$conn = gwvpmini_ConnectDB();
+
+	if($rid < 0) return;
+
+	$sql = "update repos set repos_status=2 where repos_id='$rid'";
 
 	return $conn->query($sql);
 }

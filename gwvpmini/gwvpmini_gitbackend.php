@@ -416,6 +416,8 @@ function gwvpmini_repoExists($name)
 // 2 - only owner can see anything
 function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $isremoteclone)
 {
+	global $cmd_line_tool;
+	
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
 	if($clonefrom !== false) {
@@ -425,7 +427,14 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $
 			gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);
 		} else {
 			// we do this from an outside call in the background
-			gwvpmini_SendMessage("error", "Cant clone from remote repos yet");
+			$cmd = "/usr/bin/php $cmd_line_tool $clonefrom $name backgroundclone >> /tmp/gitlog 2>&1 &";
+			error_log("cmd called as $cmd");
+			exec($cmd);
+			gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);
+			$rn = gwvpmini_getRepo(null, $name, null);
+			$rid = $rn["id"];
+			gwvpmini_SetRepoCloning($rid);
+			gwvpmini_SendMessage("info", "Background clone initiated for $name ($rid) from $clonefrom... your repo will be available once the background clone is finished");
 			return false;
 		}
 	} else {

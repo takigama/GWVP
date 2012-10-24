@@ -74,6 +74,20 @@ function gwvpcmdtool_Usage()
 function gwvpcmdtool_BackGroundClone()
 {
 	// here we parse arguments and have stuff with things and its 6am why am i doing this right now?
+	global $data_directory, $argv;
+	
+	$repo_base = gwvpmini_getConfigVal("repodir");
+	
+	$from = $argv[1];
+	$to = $argv[2];
+	echo "Would actually clone $from to $to in $data_directory\n";
+	//sleep(20);
+	
+	$cmd = "git clone --bare $from $repo_base/$to.git";
+	exec($cmd);
+	$rid = gwvpmini_GetRepoId($to);
+	gwvpmini_EnableRepo($rid);
+	echo "update $to ($rid) and enabled it\n";
 }
 
 // update will log things like branch and tag creations

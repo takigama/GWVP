@@ -422,6 +422,11 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $
 		error_log("how did i end up in clonefrom? $clonefrom");
 		if(!$isremoteclone) {
 			exec("/usr/bin/git clone --bare $repo_base/$clonefrom.git $repo_base/$name.git >> /tmp/gitlog 2>&1");
+			gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);
+		} else {
+			// we do this from an outside call in the background
+			gwvpmini_SendMessage(error, "Cant clone from remote repos yet");
+			return false;
 		}
 	} else {
 	

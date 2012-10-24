@@ -235,14 +235,14 @@ function gwvpmini_RepoCreate()
 		$uid = $_SESSION["id"];
 		
 		if($rn == false) {
-			gwvpmini_SendMessage("error", "local repo $clonefrom given as upstream clone, however $clonefrom doesnt exist on this site (or you cant read it)");
+			gwvpmini_SendMessage("error", "local repo $clonefrom given as upstream clone, however $clonefrom doesnt exist on this site (or you cant read it unbake)");
 			header("Location: $BASE_URL/repos");
 			return;
 		}
 		
 		// resolve repo permissions on the read/clone
-		if(gwvpmini_GetRepoPerm($rn, $uid) < 1) {
-			gwvpmini_SendMessage("error", "local repo $clonefrom given as upstream clone, however $clonefrom doesnt exist on this site (or you cant read it)");
+		if(gwvpmini_GetRepoPerm($rn["id"], $uid) < 1) {
+			gwvpmini_SendMessage("error", "local repo $clonefrom given as upstream clone, however $clonefrom doesnt exist on this site (or you cant read it bake)");
 			header("Location: $BASE_URL/repos");
 			return;
 		}
@@ -267,8 +267,9 @@ function gwvpmini_RepoCreate()
 			gwvpmini_SendMessage("error", "Repo ".$_REQUEST["reponame"]." already exists");
 			header("Location: $BASE_URL/repos");
 		} else {
-			gwvpmini_createGitRepo($_REQUEST["reponame"], $_SESSION["id"], $_REQUEST["repodesc"], $defperms, $clonefrom, $fromremote);
-			gwvpmini_SendMessage("info", "Repo ".$_REQUEST["reponame"]." has been created");
+			if(gwvpmini_createGitRepo($_REQUEST["reponame"], $_SESSION["id"], $_REQUEST["repodesc"], $defperms, $clonefrom, $fromremote)) {
+				gwvpmini_SendMessage("info", "Repo ".$_REQUEST["reponame"]." has been created");
+			}
 			header("Location: $BASE_URL/repos");
 		}
 	} else {

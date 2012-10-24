@@ -251,7 +251,8 @@ function gwvpmini_GetRepoPerm($rid, $uid)
 	
 	$permsarray = unserialize(base64_decode($cperms_t));
 	
-	// error_log("PERMSARRAY: ".print_r($permsarray,true));
+	error_log("PERMSARRAY: with call for $rid and user $uid ".print_r($permsarray,true));
+	
 	
 	
 	$perm = 0;

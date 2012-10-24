@@ -119,7 +119,7 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	
 	echo "</tr>";
 	
-	echo "<tr width=\"100%\"><td colspan=\"4\">";
+	echo "<tr width=\"100%\"><td colspan=\"3\">";
 	
 	echo "<table width=\"100%\"><tr width=\"100%\" valign=\"top\"><td>";
 	if($bodyFunction == null) {
@@ -133,10 +133,15 @@ function gwvpmini_goMainPage($bodyFunction = null)
 		}
 	}
 	
-	echo "</td><td align=\"right\">";
+	echo "</td>";
+	
+	/* TODO: taking out chat for now
+	echo "<td align=\"right\">";
 	
 	gwvpmini_ChatBuilder();
-	echo "</td></tr></table>";
+	echo "</td>"; */
+	
+	echo "</tr></table>";
 	
 	echo "</td></tr>";
 	

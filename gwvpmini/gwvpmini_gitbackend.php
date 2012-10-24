@@ -380,7 +380,7 @@ function gwvpmini_callGitBackend($username, $repo)
 					usleep(200000);
 					// error_log("sleep tick");
 					$stlimit++;
-					if($stlimit > 2) $continue = false;
+					if($stlimit > 50) $continue = false;
 				} else {
 					$stlimit = 0;
 					// error_log("sizes: $client_len, $cgi_len");

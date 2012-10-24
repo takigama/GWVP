@@ -425,7 +425,7 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $
 			gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);
 		} else {
 			// we do this from an outside call in the background
-			gwvpmini_SendMessage(error, "Cant clone from remote repos yet");
+			gwvpmini_SendMessage("error", "Cant clone from remote repos yet");
 			return false;
 		}
 	} else {

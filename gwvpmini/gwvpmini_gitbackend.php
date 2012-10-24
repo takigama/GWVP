@@ -67,6 +67,7 @@ function gwvpmini_gitBackendInterface()
 	header_remove("Expires");
 	header_remove("X-Powered-By");
 	header_remove("Vary");
+	//header("Content-Encoding: none");
 	
 	
 	$repo_base = gwvpmini_getConfigVal("repodir");
@@ -221,6 +222,8 @@ function gwvpmini_canManageRepo($userid, $repoid)
 	return false;
 }
 
+
+// TODO: this whole bit needs a re-write
 function gwvpmini_callGitBackend($username, $repo)
 {
 	// this is where things become a nightmare
@@ -281,9 +284,16 @@ function gwvpmini_callGitBackend($username, $repo)
 		if(isset($_SERVER["CONTENT_LENGTH"])) { 
 			$procenv["CONTENT_LENGTH"] = $_SERVER["CONTENT_LENGTH"];
 		}
+
+		$headers = getallheaders();
 		
-		// error_log("path trans'd is /$repo_base/$repo.git/$euri from $ruri with ".$_REQUEST["q"]." $strrem");
+		error_log("path trans'd is /$repo_base/$repo.git/$euri from $ruri with ".$_REQUEST["q"]." $strrem pre is ".print_r($_REQUEST,true)." and foff ".print_r($headers, true));
 		
+		if(isset($headers["Content-Encoding"])) {
+			if($headers["Content-Encoding"] == "gzip") {
+				error_log("DAM YOU GIT CLIENT");
+			}
+		}
 		
 		
 
@@ -327,6 +337,16 @@ function gwvpmini_callGitBackend($username, $repo)
 			// do client
 			if(!feof($fh)) {
 				$from_client_data = fread($fh,8192);
+				
+				// TODO: BIG TODO: must rewrite this bit. I need to read the entire client bit if its posting in one piece so i can then decode.
+				// if the client sends more then 8192, i could be very well screwed.
+				
+				if(isset($headers["Content-Encoding"])) {
+					if($headers["Content-Encoding"] == "gzip") {
+						//error_log("DAM YOU GIT CLIENT and your retarded gzip encoding");
+						$from_client_data = gzinflate(substr($from_client_data, 10));
+					}
+				}
 				if($from_client_data !== false) {
 					fwrite($pipes[0], $from_client_data);
 					fwrite($fp, $from_client_data);
@@ -335,11 +355,14 @@ function gwvpmini_callGitBackend($username, $repo)
 				//fwrite($fl, $from_client_data);
 				$client_len = strlen($from_client_data);
 			} else {
-				// error_log("client end");
+				error_log("client end");
 				$client_len = 0;
 				//$continue = false;
 			}
 			
+				
+			
+
 			// do cgi
 			// sometimes, we get a \r\n from the cgi, i do not know why she swallowed the fly,
 			// but i do know that the fgets for the headers above should have comsued that
@@ -357,9 +380,9 @@ function gwvpmini_callGitBackend($username, $repo)
 						// TODO: find out why this happens
 						$from_cgi_data = preg_replace("/^\r\n/", "", $from_cgi_data_t);
 						if(strlen($from_cgi_data)!=strlen($from_cgi_data_t)) {
-							// error_log("MOOOKS - we did trunc");
+							error_log("MOOOKS - we did trunc");
 						} else {
-							// error_log("MOOOKS - we did not trunc");
+							error_log("MOOOKS - we did not trunc");
 						}
 						$firstline = false;
 					}
@@ -379,14 +402,14 @@ function gwvpmini_callGitBackend($username, $repo)
 			else {
 				if($client_len == 0 && $cgi_len == 0) {
 					usleep(200000);
-					// error_log("sleep tick");
+					error_log("sleep tick");
 					$stlimit++;
 					if($stlimit > 50) $continue = false;
 				} else {
 					$stlimit = 0;
-					// error_log("sizes: $client_len, $cgi_len");
+					error_log("sizes: $client_len, $cgi_len");
 					if($cgi_len > 0) {
-						// error_log("from cgi: \"$from_cgi_data\"");
+						error_log("from cgi: \"$from_cgi_data\"");
 					}
 				}
 			}
@@ -394,10 +417,15 @@ function gwvpmini_callGitBackend($username, $repo)
 		}
 		
 		
+		flush();
+		error_log("and im done...");
+		
 		//fclose($fl);
 		fclose($fh);
 		fclose($pipes[1]);
 		fclose($pipes[0]);	
+		
+		exit(0);
 }
 
 
@@ -451,6 +479,5 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $
 	
 	return true;
 }
-
 
 ?>

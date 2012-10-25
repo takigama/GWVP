@@ -104,8 +104,11 @@ function gwvpmini_goMainPage($bodyFunction = null)
 	gwvpmini_SearchBuilder();
 	echo "</td></tr>";
 	
-
-	if(isset($_SESSION["message"])) {
+	$havemessage = false;
+	if(isset($_SESSION["message"])) $havemessage = true;
+	if(isset($_SESSION["id"])) if(gwvpmini_GetMessagesForId($_SESSION["id"]) !== 0) $havemessage = true;
+	
+	if($havemessage) {
 		echo "<tr width=\"100%\"><td colspan=\"2\">";
 		gwvpmini_MessageBuilder();
 		echo "</td></tr>";
@@ -155,11 +158,30 @@ function gwvpmini_goMainPage($bodyFunction = null)
 // builds the message builder if its needed
 function gwvpmini_MessageBuilder()
 {
+	
+	error_log("begin message building?");
 	$message = "";
 	$messagetype = "info";
 	if(isset($_SESSION["message"])) $message = $_SESSION["message"];
 	if(isset($_SESSION["messagetype"])) $messagetype = $_SESSION["messagetype"];
+	if(isset($_SESSION["id"])) $dbmsgs = gwvpmini_GetMessagesForId($_SESSION["id"]);
 	
+	error_log("dbmsgs was 0 - ".print_r($_SESSION,true));
+	
+	if($dbmsgs !== 0) {
+		foreach($dbmsgs as $mgkey => $mgval) {
+			$data = $mgval["data"];
+			switch($mgval["type"]) {
+				case "info":
+					echo "<table border=\"1\" width=\"100%\"><tr width=\"100%\"><td bgcolor=\"#AAFFAA\">$data</td></tr></table>";
+					break;
+				case "error":
+					echo "<table border=\"1\" width=\"100%\"><tr width=\"100%\"><td bgcolor=\"#FFAAAA\">$data</td></tr></table>";
+					break;
+			}
+			gwvpmini_DeleteMessagesById($mgval["id"]);
+		}
+	} 
 	if($message != "") {
 		switch($messagetype) {
 			case "info":

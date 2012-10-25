@@ -78,6 +78,8 @@ function gwvpcmdtool_BackGroundClone()
 	
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
+	sleep(60);
+	
 	$from = $argv[1];
 	$to = $argv[2];
 	echo "Would actually clone $from to $to in $data_directory\n";

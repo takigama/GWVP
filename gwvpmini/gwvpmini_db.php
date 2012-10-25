@@ -547,6 +547,15 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	"repos_origin" TEXT,
 	UNIQUE(repos_name)
 	)';
+	
+	$msgsql = '
+	CREATE TABLE "messages" (
+	"msgs_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"msgs_type" TEXT,
+	"msgs_data" TEXT,
+	"msgs_to_id" TEXT
+	)';
+	
 
 	// this looks like null, <repoid>, <read|visible|write>, user:<uid>|group:<gid>|authed|anon
 	// where authed = any authenticated user, anon = everyone (logged in, not logged in, etc)
@@ -592,6 +601,7 @@ function gwvpmini_dbCreateSQLiteStructure($dbloc)
 	$DB_CONNECTION->query($reposql);
 	$DB_CONNECTION->query($configsql);
 	$DB_CONNECTION->query($activitysql);
+	$DB_CONNECTION->query($msgsql);
 }
 
 function gwvpmini_getConfigVal($confname)
@@ -694,6 +704,59 @@ function gwvpmini_GetRepoDescFromName($reponame)
 	}
 
 	return $retval;
+}
+
+function gwvpmini_SendMessageByDb($type, $data, $forid)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "insert into messages values (null, '$type', '$data', '$forid')";
+	
+	return $conn->query($sql);
+}
+
+function gwvpmini_GetMessagesForId($uid)
+{
+	/*
+	 * 	$msgsql = '
+	CREATE TABLE "messages" (
+	"msgs_id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"msgs_type" TEXT,
+	"msgs_data" TEXT,
+	"msgs_to_id" TEXT,
+	)';
+
+	 */
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "select * from messages where msgs_to_id='$uid'";
+	// error_log("desc for name sql: $sql");
+	
+	$res = $conn->query($sql);
+	
+	error_log("request message for uid, $uid with sql $sql");
+	
+	$i = 0;
+	if(!$res) return 0;
+	foreach($res as $row) {
+		$retval[$i]["id"] = $row["msgs_id"];
+		$retval[$i]["type"] = $row["msgs_type"];
+		$retval[$i]["data"] = $row["msgs_data"];
+		$i++;
+	}
+	
+	
+	return $retval;
+	
+}
+
+function gwvpmini_DeleteMessagesById($mid)
+{
+	$conn = gwvpmini_ConnectDB();
+	
+	$sql = "delete from messages where msgs_id='$mid'";
+	
+	return $conn->query($sql);
 }
 
 function gwvpmini_GetRepoOwnerDetailsFromName($reponame)
@@ -848,7 +911,7 @@ function gwvpmini_GetOwnedRepos($username)
 		// error_log(print_r($row, true));
 	}
 	
-	// error_log(print_r($retval, true));
+	error_log(print_r($retval, true));
 	return $retval;
 }
 

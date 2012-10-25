@@ -55,6 +55,7 @@ function gwvpmini_RepoMainPageBody()
 	
 	if(gwvpmini_isLoggedIn()) {
 		$repos = gwvpmini_GetOwnedRepos($_SESSION["username"]);
+		error_log("repos, ".print_r($repos, true));
 		if(!$repos) {
 			echo "You currently own no repos<br>";	
 		} else {
@@ -63,26 +64,37 @@ function gwvpmini_RepoMainPageBody()
 			foreach($repos as $repo) {
 				$name = $repo["name"];
 				$desc = $repo["desc"];
+				$stat = $repo["status"];
+				$llog = "";
+				if($stat != 0) {
+					switch($stat) {
+						case 1:
+							$llog = "Repo Administratively Disabled";
+							break;
+						case 2:
+							$llog = "Repo Cloning from remote";
+							break;
+					}
+				} else {
 				
-				if($desc == "") $desc = "none";
-				
-				$repo_base = gwvpmini_getConfigVal("repodir");
-				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
-				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td>";
-				echo "<td>";
-				// error_log("CMD: $cmd");
-				//system("$cmd");
-				$fls = popen($cmd, "r");
-				$tks = "";
-				if($fls !== false) while(!feof($fls)) {
-					$tks .= fread($fls,1024);
+					if($desc == "") $desc = "none";
+					
+					$repo_base = gwvpmini_getConfigVal("repodir");
+					$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
+					// error_log("CMD: $cmd");
+					//system("$cmd");
+					$fls = popen($cmd, "r");
+					$tks = "";
+					if($fls !== false) while(!feof($fls)) {
+						$tks .= fread($fls,1024);
+					}
+					
+					if($tks == "") {
+						$llog =  "No Log Info Yet";
+					} else $llog = $tks;
+					
 				}
-				
-				if($tks == "") {
-					echo "No Log Info Yet";
-				} else echo $tks;
-				echo "</td>";
-				echo "</tr>";
+				echo "<tr><td><a href=\"$BASE_URL/view/$name\">$name</a></td><td>$desc</td><td>$llog</td></tr>";
 			}
 			echo "</table>";
 		}
@@ -97,19 +109,31 @@ function gwvpmini_RepoMainPageBody()
 			foreach($contreps as $repo) {
 				$name = $repo["name"];
 				$desc = $repo["desc"];
-				$repo_base = gwvpmini_getConfigVal("repodir");
-				$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
-				// error_log("CMD: $cmd");
-				//system("$cmd");
-				$fls = popen($cmd, "r");
-				$tks = "";
-				if($fls !== false) while(!feof($fls)) {
-					$tks .= fread($fls,1024);
+				$stat = $repo["status"];
+				if($stat != 0) {
+					switch($stat) {
+						case 1:
+							$lastlog = "Repo Administratively Disabled";
+							break;
+						case 2:
+							$lastlog = "Repo Cloning from remote";
+							break;
+					}
+				} else {
+					$repo_base = gwvpmini_getConfigVal("repodir");
+					$cmd = "git --git-dir=\"$repo_base/$name.git\" log --all -1 2> /dev/null";
+					// error_log("CMD: $cmd");
+					//system("$cmd");
+					$fls = popen($cmd, "r");
+					$tks = "";
+					if($fls !== false) while(!feof($fls)) {
+						$tks .= fread($fls,1024);
+					}
+					
+					if($tks == "") {
+						$lastlog = "No Log Info Yet";
+					} else $lastlog = $tks;
 				}
-				
-				if($tks == "") {
-					$lastlog = "No Log Info Yet";
-				} else $lastlog = $tks;
 				
 				$owner = gwvpmini_getUser(null, null, $repo["owner"]);
 				$repname = "<a href=\"$BASE_URL/view/$name\">$name</a>";

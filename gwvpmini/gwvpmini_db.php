@@ -745,8 +745,8 @@ function gwvpmini_GetMessagesForId($uid)
 		$i++;
 	}
 	
-	
-	return $retval;
+	if($i == 0) return 0;
+	else return $retval;
 	
 }
 

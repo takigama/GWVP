@@ -142,7 +142,29 @@ function gwvpmini_TimeDiffText($time)
 	if($tdiff < 60) return "$tdiff Seconds Ago";
 	if($tdiff < 3600) return "".(int)($tdiff/60)." Minutes Ago";
 	if($tdiff < 86400) return "".(int)($tdiff/3600)." Hours Ago";
-	return "".(int)($tdiff/86400)." Days Ago";
+	if($tdiff < 2592000) {
+		return "".(int)($tdiff/86400)." Days Ago";
+	}
+	if($tdiff < 31536000) {
+		$months = (int)($tdiff/2592000);
+		$days = (int)(($tdiff%2592000)/86400);
+		
+		$txt = "$months Month";
+		if($months > 1) $txt .= "s";
+		if($days > 0) $txt .= " and $days Day";
+		if($days > 1) $txt .= "s";
+		return $txt." ago";
+	}
+	
+	$years = (int)($tdiff/31536000);
+	$months = (int)(($tdiff%31536000)/2592000);
+	$txt = "$years Year";
+	if($years > 1) $txt .= "s";
+	if($months > 0) $txt .= " and $months Month";
+	if($months > 1) $txt .= "s";
+	
+	return $txt." ago";
+	
 }
 
 ?>

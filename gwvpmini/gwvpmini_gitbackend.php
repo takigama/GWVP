@@ -287,7 +287,7 @@ function gwvpmini_callGitBackend($username, $repo)
 
 		$headers = getallheaders();
 		
-		error_log("path trans'd is /$repo_base/$repo.git/$euri from $ruri with ".$_REQUEST["q"]." $strrem pre is ".print_r($_REQUEST,true)." and foff ".print_r($headers, true));
+		//error_log("path trans'd is /$repo_base/$repo.git/$euri from $ruri with ".$_REQUEST["q"]." $strrem pre is ".print_r($_REQUEST,true)." and foff ".print_r($headers, true));
 		
 		$pwd = "/$repo_base/";
 		
@@ -390,9 +390,10 @@ function gwvpmini_callGitBackend($username, $repo)
 					}
 				}
 				
-				if($from_cgi_data !== false) {
-					error_log("send to client");
+				if($from_cgi_data !== false && $from_cgi_data != "") {
+					error_log("send to client ($from_cgi_data)");
 					echo $from_cgi_data;
+					ob_flush();
 					flush();
 				}
 				$cgi_len = strlen($from_cgi_data);
@@ -407,12 +408,12 @@ function gwvpmini_callGitBackend($username, $repo)
 			else {
 				if($client_len == 0 && $cgi_len == 0) {
 					usleep(200000);
-					error_log("sleep tick");
+					//error_log("sleep tick");
 					$stlimit++;
-					if($stlimit > 5000) $continue = false;
+					if($stlimit > 300) $continue = false; // if we get no output from git backend after 1 minute, we close..... something went wrong
 				} else {
 					$stlimit = 0;
-					error_log("sizes: $client_len, $cgi_len");
+					//error_log("sizes: $client_len, $cgi_len");
 					if($cgi_len > 0) {
 						//error_log("from cgi: \"$from_cgi_data\"");
 					}

@@ -323,7 +323,7 @@ function gwvpmini_callGitBackend($username, $repo)
 		
 		
 		$stlimit = 0;
-		$fp = fopen("/tmp/gitup.".rand(0,4000000), "w");
+		//$fp = fopen("/tmp/gitup.".rand(0,4000000), "w");
 		$from_client_data = "";
 		// i was going to use stream_select, but i feel this works better like this
 		while($continue) {
@@ -351,7 +351,7 @@ function gwvpmini_callGitBackend($username, $repo)
 				}
 				if($from_client_data !== false) {
 					fwrite($pipes[0], $from_client_data);
-					fwrite($fp, $from_client_data);
+					//fwrite($fp, $from_client_data);
 				}
 				fflush($pipes[0]);
 				//fwrite($fl, $from_client_data);
@@ -381,17 +381,18 @@ function gwvpmini_callGitBackend($username, $repo)
 						// or something the git-http-backend thing is doing..
 						// TODO: find out why this happens
 						$from_cgi_data = preg_replace("/^\r\n/", "", $from_cgi_data_t);
+						/*
 						if(strlen($from_cgi_data)!=strlen($from_cgi_data_t)) {
 							error_log("MOOOKS - we did trunc");
 						} else {
 							error_log("MOOOKS - we did not trunc");
-						}
+						}*/
 						$firstline = false;
 					}
 				}
 				
 				if($from_cgi_data !== false && $from_cgi_data != "") {
-					error_log("send to client ($from_cgi_data)");
+					//error_log("send to client of size ".strlen($from_cgi_data));
 					echo $from_cgi_data;
 					ob_flush();
 					flush();

@@ -467,7 +467,7 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $
 			$rn = gwvpmini_getRepo(null, $name, null);
 			$rid = $rn["id"];
 			gwvpmini_SetRepoCloning($rid);
-			gwvpmini_SendMessage("info", "Background clone initiated for $name ($rid) from $clonefrom... your repo will be available once the background clone is finished");
+			gwvpmini_SendMessageByDb("info", "Background clone initiated for $name ($rid) from $clonefrom... your repo will be available once the background clone is finished", $ownerid);
 			return false;
 		}
 	} else {

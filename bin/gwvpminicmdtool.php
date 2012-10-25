@@ -87,8 +87,13 @@ function gwvpcmdtool_BackGroundClone()
 	
 	$cmd = "git clone --bare $from $repo_base/$to.git";
 	exec($cmd);
-	$rid = gwvpmini_GetRepoId($to);
+	$rn = gwvpmini_getRepo(null, $to, null);
+	$rid = $rn["id"];
+	$uid = $rn["ownerid"];
 	gwvpmini_EnableRepo($rid);
+	
+	//gwvpmini_SendMessageByDb($type, $data, $forid)
+	gwvpmini_SendMessageByDb("info", "Repo $to has finished cloning and now ready", $uid);
 	echo "update $to ($rid) and enabled it\n";
 }
 

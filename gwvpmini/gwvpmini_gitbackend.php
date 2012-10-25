@@ -339,7 +339,7 @@ function gwvpmini_callGitBackend($username, $repo)
 				$from_client_data = fread($fh,8192);
 				
 				// TODO: BIG TODO: must rewrite this bit. I need to read the entire client bit if its posting in one piece so i can then decode.
-				// if the client sends more then 8192, i could be very well screwed.
+				// if the client sends more then 8192, i could be very well screwed. must handle content-length on read...
 				
 				if(isset($headers["Content-Encoding"])) {
 					if($headers["Content-Encoding"] == "gzip") {

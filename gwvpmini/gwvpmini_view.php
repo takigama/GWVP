@@ -215,7 +215,8 @@ function gwvpmini_RepoViewPageBody()
 					$flon = "$flin3 (external)";
 				}
 			}
-			echo "<tr><td>".gwvpmini_HtmlGravatar($flin2, 18)."$flon</td><td>$flin1</td><td>$flin4</td></tr>";
+			$timedifftxt = gwvpmini_TimeDiffText($flin1);
+			echo "<tr><td>".gwvpmini_HtmlGravatar($flin2, 18)."$flon</td><td>$timedifftxt</td><td>$flin4</td></tr>";
 		}
 		echo "</table>";
 	} else {

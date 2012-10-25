@@ -335,7 +335,7 @@ function gwvpmini_callGitBackend($username, $repo)
 				if(isset($headers["Content-Length"])) {
 					$cl = $headers["Content-Length"];
 					while(strlen($from_client_data) < $cl) {
-						error_log("re-read ".strlen($from_client_data));
+						error_log("re-read ".strlen($from_client_data)." of $cl");
 						$from_client_data .= fread($fh, $cl);
 					}
 				} else 	$from_client_data = fread($fh,8192);
@@ -350,6 +350,8 @@ function gwvpmini_callGitBackend($username, $repo)
 					}
 				}
 				if($from_client_data !== false) {
+					
+					// push the data from the client straight to backend
 					fwrite($pipes[0], $from_client_data);
 					//fwrite($fp, $from_client_data);
 				}

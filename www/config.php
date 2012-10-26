@@ -13,5 +13,9 @@ $db_password = "";
 
 $cmd_line_tool = realpath("../bin/gwvpminicmdtool.php");
 
+$git_backend_cmd = "/usr/lib/git-core/git-http-backend";
+$git_cli_cmd = "/usr/bin/git";
+$php_cli_cmd = "/usr/bin/php";
+
 //error_log("included config file");
 ?>

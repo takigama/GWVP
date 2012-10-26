@@ -4,6 +4,8 @@ $WEB_ROOT_FS = realpath(dirname(__FILE__));
 $BASE_URL = "/";
 
 global $WEB_ROOT_FS, $BASE_URL, $IS_WEB_REQUEST, $data_directory, $db_type, $db_name, $db_username, $db_password, $IS_WEB_REQUEST, $cmd_line_tool;
+global $git_backend_cmd, $git_cli_cmd, $php_cli_cmd, $data_directory, $cmd_line_tool;
+
 $IS_WEB_REQUEST = false;
 
 if(file_exists("$WEB_ROOT_FS/../www/config.php")) require_once("$WEB_ROOT_FS/../www/config.php");
@@ -74,7 +76,7 @@ function gwvpcmdtool_Usage()
 function gwvpcmdtool_BackGroundClone()
 {
 	// here we parse arguments and have stuff with things and its 6am why am i doing this right now?
-	global $data_directory, $argv;
+	global $data_directory, $argv, $git_backend_cmd, $git_cli_cmd, $php_cli_cmd, $data_directory, $cmd_line_tool;
 	
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
@@ -85,7 +87,7 @@ function gwvpcmdtool_BackGroundClone()
 	echo "Would actually clone $from to $to in $data_directory\n";
 	//sleep(20);
 	
-	$cmd = "git clone --bare $from $repo_base/$to.git";
+	$cmd = "$git_cli_cmd clone --bare $from $repo_base/$to.git";
 	exec($cmd);
 	$rn = gwvpmini_getRepo(null, $to, null);
 	$rid = $rn["id"];
@@ -100,7 +102,7 @@ function gwvpcmdtool_BackGroundClone()
 // update will log things like branch and tag creations
 function gwvpcmdtool_UpdateHook()
 {
-	global $argv;
+	global $argv, $git_backend_cmd, $git_cli_cmd, $php_cli_cmd, $data_directory, $cmd_line_tool;
 	//echo "got ".$argv[2].", ".$argv[3].", ".$argv[4]."\n";
 	if(preg_match("/^000000+$/", $argv[5])) {
 		// createion of tag or branch
@@ -121,7 +123,7 @@ function gwvpcmdtool_UpdateHook()
 // pre-receive logs all commit info
 function gwvpcmdtool_PreReceive()
 {
-	global $argv;
+	global $argv, $git_backend_cmd, $git_cli_cmd, $php_cli_cmd, $data_directory, $cmd_line_tool;
 
 	//echo "got from prereceive ".$argv[2].", ".$argv[3].", ".$argv[4]."\n";
 	
@@ -131,7 +133,7 @@ function gwvpcmdtool_PreReceive()
 	$regspl = explode("/", $ref);
 	$branch = $regspl[2];
 	
-	$fp = popen("git rev-list --reverse ".$argv[5]." --not --all ", "r");
+	$fp = popen("$git_cli_cmd rev-list --reverse ".$argv[5]." --not --all ", "r");
 	if($fp) while(!feof($fp)) {
 		$line = trim(fgets($fp));
 		if($line != "") {
@@ -149,7 +151,9 @@ function gwvpcmdtool_PreReceive()
 
 function gwvpcmdtool_getCommitIdDetails($commitid)
 {
-	$rs = popen("git log --pretty=format:\"%at%n%ce%n%an%n%s\" $commitid -1 2> /dev/null", "r");
+	global $git_backend_cmd, $git_cli_cmd, $php_cli_cmd, $data_directory, $cmd_line_tool;
+	
+	$rs = popen("$git_cli_cmd log --pretty=format:\"%at%n%ce%n%an%n%s\" $commitid -1 2> /dev/null", "r");
 	$ret = array();
 	if($rs) {
 		$ret["date"] = trim(fgets($rs));

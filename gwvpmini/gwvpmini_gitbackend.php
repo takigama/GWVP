@@ -59,7 +59,7 @@ function gwvpmini_CreateRepoHooks($repopath, $cmdpath, $reponame)
 function gwvpmini_gitBackendInterface()
 {
 	// and this is where i re-code the git backend interface from scratch
-	global $BASE_URL, $cmd_line_tool;
+	global $BASE_URL, $cmd_line_tool, $git_cli_cmd;
 	
 	header_remove("Pragma");
 	header_remove("Cache-Control");
@@ -226,6 +226,9 @@ function gwvpmini_canManageRepo($userid, $repoid)
 // TODO: this whole bit needs a re-write - seriously, like totally!
 function gwvpmini_callGitBackend($username, $repo)
 {
+	
+	global $git_backend_cmd, $git_cli_cmd, $php_cli_cmd, $data_directory, $cmd_line_tool;
+	
 	// this is where things become a nightmare
 		$fh   = fopen('php://input', "r");
 		
@@ -291,7 +294,7 @@ function gwvpmini_callGitBackend($username, $repo)
 		
 		$pwd = "/$repo_base/";
 		
-		$proc = proc_open("/usr/lib/git-core/git-http-backend", array(array("pipe","rb"),array("pipe","wb"),array("file","/tmp/err", "a")), $pipes, $pwd, $procenv);
+		$proc = proc_open("$git_backend_cmd", array(array("pipe","rb"),array("pipe","wb"),array("file","/tmp/err", "a")), $pipes, $pwd, $procenv);
 		
 		$untilblank = false;
 		while(!$untilblank&&!feof($pipes[1])) {
@@ -452,18 +455,18 @@ function gwvpmini_repoExists($name)
 // 2 - only owner can see anything
 function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $isremoteclone)
 {
-	global $cmd_line_tool;
+	global $cmd_line_tool,$git_cli_cmd,$php_cli_cmd;
 	
 	$repo_base = gwvpmini_getConfigVal("repodir");
 	
 	if($clonefrom !== false) {
 		error_log("how did i end up in clonefrom? $clonefrom");
 		if(!$isremoteclone) {
-			exec("/usr/bin/git clone --bare $repo_base/$clonefrom.git $repo_base/$name.git >> /tmp/gitlog 2>&1");
+			exec("$git_cli_cmd clone --bare $repo_base/$clonefrom.git $repo_base/$name.git >> /tmp/gitlog 2>&1");
 			gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);
 		} else {
 			// we do this from an outside call in the background
-			$cmd = "/usr/bin/php $cmd_line_tool $clonefrom $name backgroundclone >> /tmp/gitlog 2>&1 &";
+			$cmd = "$php_cli_cmd $cmd_line_tool $clonefrom $name backgroundclone >> /tmp/gitlog 2>&1 &";
 			error_log("cmd called as $cmd");
 			exec($cmd);
 			gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);
@@ -477,9 +480,9 @@ function gwvpmini_createGitRepo($name, $ownerid, $desc, $defperms, $clonefrom, $
 	
 	// phew, this works, but i tell you this - bundles arent quite as nice as they should be
 	// error_log("would create $repo_base/$name.git");
-		exec("/usr/bin/git init $repo_base/$name.git --bare >> /tmp/gitlog 2>&1");
+		exec("$git_cli_cmd init $repo_base/$name.git --bare >> /tmp/gitlog 2>&1");
 		chdir("$repo_base/$name.git");
-		exec("/usr/bin/git update-server-info");
+		exec("$git_cli_cmd update-server-info");
 	
 		// gwvpmini_AddRepo($reponame, $repodesc, $repoowner, $defaultperms = 0)
 		gwvpmini_AddRepo($name, $desc, $ownerid, $defperms, $clonefrom);

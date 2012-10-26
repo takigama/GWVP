@@ -351,5 +351,48 @@ function gwvpmini_CompressCommitId($cid)
 	
 	return $compressedcid;
 }
+
+function gwvpmini_GetCommitDetail($repo, $commitid)
+{
+	global $cmd_line_tool,$git_cli_cmd,$php_cli_cmd;
+	
+	$repo_base = gwvpmini_getConfigVal("repodir");
+	
+	$cmd = "$cmd_line_tool --git-dir=$repo_base/$repo.git log $commitid -1 --format='%an'";	
+	exec($cmd, $commitername, $returnvar);
+
+	$cmd = "$cmd_line_tool --git-dir=$repo_base/$repo.git log $commitid -1 --format='%ae'";	
+	exec($cmd, $commiteremail, $returnvar);
+
+	$cmd = "$cmd_line_tool --git-dir=$repo_base/$repo.git log $commitid -1 --format='%ct'";	
+	exec($cmd, $commitertime, $returnvar);
+
+	$cmd = "$cmd_line_tool --git-dir=$repo_base/$repo.git log $commitid -1 --format='%s'";	
+	exec($cmd, $commiterlog, $returnvar);
+
+	$cmd = "$cmd_line_tool --git-dir=$repo_base/$repo.git log $commitid -1 --format='%b'";	
+	exec($cmd, $commiterbody, $returnvar);
+}
+
+function gwvpmini_GetCommitList($repo, $branch, $num=20)
+{
+	global $cmd_line_tool,$git_cli_cmd,$php_cli_cmd;
+	
+	$repo_base = gwvpmini_getConfigVal("repodir");
+	
+	$cmd = "$cmd_line_tool --git-dir=$repo_base/$repo.git log $commitid -1 --format='%an'";
+	exec($cmd, $commitername, $returnvar);
+	
+}
+
+function gwvpmini_GetRefList($repo)
+{
+	global $cmd_line_tool,$git_cli_cmd,$php_cli_cmd;
+	
+	$repo_base = gwvpmini_getConfigVal("repodir");
+
+	$cmd = "$cmd_line_tool --git-dir=$repo_base/$repo.git for-each-ref $commitid --format='%(objecttype):%(objectname):%(refname)'";
+	exec($cmd, $reflist, $returnvar);
+}
 	
 ?>

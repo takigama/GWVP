@@ -4,6 +4,7 @@ $WEB_ROOT_FS = realpath(dirname(__FILE__));
 $BASE_URL = dirname($_SERVER["PHP_SELF"]);
 
 global $WEB_ROOT_FS, $BASE_URL, $data_directory, $db_type, $db_name, $db_username, $db_password, $IS_WEB_REQUEST, $cmd_line_tool;
+global $git_backend_cmd, $git_cli_cmd, $php_cli_cmd, $data_directory, $cmd_line_tool;
 
 $IS_WEB_REQUEST = true;
 

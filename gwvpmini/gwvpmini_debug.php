@@ -44,11 +44,23 @@ function gwvpmini_DebugPageBody()
 	}
 	
 	echo "<hr>Sending some messages for db<br>";
-	gwvpmini_SendMessageByDb("info", "message 1", $_SESSION["id"]);
-	gwvpmini_SendMessageByDb("error", "message 1", $_SESSION["id"]);
-	gwvpmini_SendMessageByDb("info", "message 1", $_SESSION["id"]);
-	gwvpmini_SendMessageByDb("error", "message really really reallyrea rea asdf asdf asdf asdf asdf qwef asdf asdr qwef asdf qwef asdf asd fqwe fqs dfa sdf qwe fa sdf asd fq wef qdwf asdf qwe fa sdf asdf a ewfqa wesf awefqefd", $_SESSION["id"]);
-	gwvpmini_SendMessageByDb("info", "message 1 sdfg sdfgs fdg sdfg sdfg sdfg sdfg sdfg sdfgwqerg fb sdvbefd wqerg zsdafg asdfgargf aerg afg agfs qrgasg agf wergafgs sag arg arg asgd arg argsa garg aerg sad gf ar gfasdg asd aweg asasd", $_SESSION["id"]);
+	//gwvpmini_SendMessageByDb("info", "message 1", $_SESSION["id"]);
+	//gwvpmini_SendMessageByDb("error", "message 1", $_SESSION["id"]);
+	//gwvpmini_SendMessageByDb("info", "message 1", $_SESSION["id"]);
+	//gwvpmini_SendMessageByDb("error", "message really really reallyrea rea asdf asdf asdf asdf asdf qwef asdf asdr qwef asdf qwef asdf asd fqwe fqs dfa sdf qwe fa sdf asd fq wef qdwf asdf qwe fa sdf asdf a ewfqa wesf awefqefd", $_SESSION["id"]);
+	//gwvpmini_SendMessageByDb("info", "message 1 sdfg sdfgs fdg sdfg sdfg sdfg sdfg sdfg sdfgwqerg fb sdvbefd wqerg zsdafg asdfgargf aerg afg agfs qrgasg agf wergafgs sag arg arg asgd arg argsa garg aerg sad gf ar gfasdg asd aweg asasd", $_SESSION["id"]);
 	echo "done<br>";
+	
+	$repo_base = gwvpmini_getConfigVal("repodir");
+	
+	$repos = glob("$repo_base/*.git");
+	
+	foreach($repos as $repo) {
+		$bn = substr(basename($repo), 0, -4);
+		echo "Repo: $repo, $bn<br>";
+		echo "reflist:<pre>".print_r(gwvpmini_GetRefList($bn),true)."</pre>";
+	}
+	
+	
 }
 ?>
